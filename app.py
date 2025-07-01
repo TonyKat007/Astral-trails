@@ -38,8 +38,8 @@ with tabs[0]:
     st.subheader("Radiation Risk Calculator")
     st.info("This tool estimates the radiation dose and cancer risk for a space mission based on real-time solar particle flux and selected shielding.")
     # Inputs
-    mission_days = st.slider("🕒 Mission Duration (days)", 1, 1000, 180)
-    shielding_material = st.selectbox("🛡️ Shielding Material", ["None", "Aluminum", "Polyethylene"])
+    mission_days = st.slider("Mission Duration (days)", 1, 1000, 180)
+    shielding_material = st.selectbox("Shielding Material", ["None", "Aluminum", "Polyethylene"])
 
     # Real-time proton flux from NOAA
     url = "https://services.swpc.noaa.gov/json/goes/primary/differential-proton-flux-1-day.json"
@@ -47,10 +47,10 @@ with tabs[0]:
     try:
         data = requests.get(url).json()
         flux = float(data[-1]['flux'])  # protons/cm²/s/sr
-        st.success(f"☀️ Live Proton Flux (≥10 MeV): {flux:.2e} protons/cm²/s/sr")
+        st.success(f"Live Proton Flux (≥10 MeV): {flux:.2e} protons/cm²/s/sr")
     except:
         flux = 100  # fallback if API fails
-        st.warning("⚠️ Unable to fetch live data. Using default flux: 100 p/cm²/s/sr")
+        st.warning("Unable to fetch live data. Using default flux: 100 p/cm²/s/sr")
 
     # Simplified dose model
     base_dose_per_day = flux * 0.00005  # empirical approximation
@@ -70,7 +70,7 @@ with tabs[0]:
     import matplotlib.pyplot as plt
     import numpy as np
 
-    st.subheader("📊 Dose Accumulation Over Time")
+    st.subheader("Dose Accumulation Over Time")
     days = np.arange(1, mission_days + 1)
     dose_over_time = daily_dose * days
 
@@ -82,7 +82,7 @@ with tabs[0]:
     st.pyplot(fig)
 
     # Monte Carlo simulation
-    st.subheader("🎲 Monte Carlo Simulation (1000 Astronauts)")
+    st.subheader("Monte Carlo Simulation (1000 Astronauts)")
     simulated_doses = np.random.normal(loc=total_dose, scale=0.1 * total_dose, size=1000)
 
     fig2, ax2 = plt.subplots()
@@ -94,7 +94,7 @@ with tabs[0]:
 
     # Shielding effectiveness table
     import pandas as pd
-    st.subheader("🛡️ Shielding Material Effectiveness")
+    st.subheader("Shielding Material Effectiveness")
 
     data_table = {
         "Material": ["None", "Aluminum", "Polyethylene"],
@@ -104,8 +104,37 @@ with tabs[0]:
     st.dataframe(df)
 # Tab 2: Shower Map
 with tabs[1]:
-    st.subheader("Cosmic Ray Shower Map (Coming Soon)")
-    st.info("Visualize cosmic ray secondary showers using real or simulated data on a world map.")
+    from streamlit_folium import folium_static
+    import folium
+    import random
+
+    st.subheader("Live Cosmic Ray Shower Map")
+
+    # Mock: Generate fake cosmic ray shower locations
+    st.info("Map currently shows **mock shower data**. Live data from observatories coming soon!")
+
+    # Create base map
+    m = folium.Map(location=[20, 0], zoom_start=2, tiles="Stamen Terrain")
+
+    # Generate mock secondary showers
+    for _ in range(25):
+        lat = random.uniform(-60, 60)
+        lon = random.uniform(-180, 180)
+        intensity = random.choice(['Low', 'Moderate', 'High'])
+        color = {'Low': 'green', 'Moderate': 'orange', 'High': 'red'}[intensity]
+
+        folium.CircleMarker(
+            location=[lat, lon],
+            radius=6,
+            popup=f"Secondary Shower\nIntensity: {intensity}",
+            color=color,
+            fill=True,
+            fill_opacity=0.7
+        ).add_to(m)
+
+    folium_static(m)
+
+    st.caption("Data simulated for demonstration. Future version will include real-time showers from cosmic ray arrays.")
 
 # Tab 3: Biological Effects
 with tabs[2]:
