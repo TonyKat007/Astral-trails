@@ -2,3 +2,5 @@ streamlit
 requests
 numpy
 datetime
+matplotlib
+pandas
