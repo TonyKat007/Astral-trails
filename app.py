@@ -144,9 +144,9 @@ with tabs[1]:
 # Tab 3: Biological Effects
 with tabs[2]:
     with tabs[2]:
-    st.subheader("🧠 Biological Effects of Radiation")
+    st.subheader("Biological Effects of Radiation")
 
-    dose = st.slider("☢️ Select Radiation Dose (mSv)", 0, 10000, 200)
+    dose = st.slider("Select Radiation Dose (mSv)", 0, 10000, 200)
 
     # Define effect stage
     if dose < 100:
@@ -162,12 +162,12 @@ with tabs[2]:
     else:
         effect = "Fatal in most cases. Survival unlikely without immediate medical care."
 
-    st.info(f"🧬 Biological Effect at {dose} mSv: **{effect}**")
+    st.info(f"Biological Effect at {dose} mSv: **{effect}**")
 
     # Plot: Dose vs Risk Severity
     import matplotlib.pyplot as plt
 
-    st.subheader("📈 Risk Severity Chart")
+    st.subheader("Risk Severity Chart")
 
     doses = [0, 100, 500, 1000, 3000, 6000, 10000]
     risks = [0, 1, 2, 3, 4, 5, 6]
@@ -188,7 +188,7 @@ with tabs[2]:
     st.pyplot(fig)
 
     # Table: Organ-specific susceptibility (simplified)
-    st.subheader("🧠 Organ Susceptibility (Generalized)")
+    st.subheader("Organ Susceptibility (Generalized)")
 
     import pandas as pd
     df = pd.DataFrame({
