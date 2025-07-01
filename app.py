@@ -271,9 +271,42 @@ These **Single Event Upsets (SEUs)** can cause:
 
 # Tab 5: CR Data Explorer
 with tabs[4]:
-    st.subheader("Cosmic Ray Data Explorer (Coming Soon)")
-    st.info("Explore real cosmic ray spectra from space missions and particle detectors.")
+    import numpy as np
+    import matplotlib.pyplot as plt
 
+    st.subheader("📈 Cosmic Ray Data Explorer")
+
+    source = st.selectbox("🔬 Select Data Source", ["AMS-02", "Voyager 1", "Mock Data"])
+    particle = st.selectbox("🧪 Select Particle Type", ["Protons", "Helium Nuclei", "Iron Nuclei"])
+
+    # Generate sample spectra (mock data)
+    energy = np.logspace(0.1, 3, 50)  # MeV
+    if particle == "Protons":
+        flux = 1e4 * energy**-2.7
+    elif particle == "Helium Nuclei":
+        flux = 1e3 * energy**-2.6
+    else:
+        flux = 200 * energy**-2.5
+
+    fig, ax = plt.subplots()
+    ax.loglog(energy, flux, label=f"{particle} Spectrum")
+    ax.set_xlabel("Energy (MeV)")
+    ax.set_ylabel("Flux (particles/m²·s·sr·MeV)")
+    ax.set_title(f"Cosmic Ray Spectrum - {source}")
+    ax.grid(True, which='both', linestyle='--', linewidth=0.5)
+    ax.legend()
+
+    st.pyplot(fig)
+
+    st.markdown("""
+📡 **Cosmic Ray Spectra** represent the distribution of particle flux over different energies.  
+These spectra vary based on:
+- Particle type (proton, helium, etc.)
+- Source (e.g., solar, galactic, extragalactic)
+- Location (Earth orbit vs interstellar)
+
+Real data from **AMS-02**, **Voyager**, or **CRDB** can be connected in later versions.
+    """)
 # Tab 6: Dose Comparison
 with tabs[5]:
     st.subheader("Mission Dose Comparator (Coming Soon)")
