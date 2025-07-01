@@ -201,8 +201,73 @@ with tabs[2]:
 
 # Tab 4: Effects on Electronics
 with tabs[3]:
-    st.subheader("Effects on Electronics (Coming Soon)")
-    st.info("Simulate the impact of cosmic radiation on satellite systems, memory errors, and electronics.")
+    st.subheader("💻 Effects of Cosmic Radiation on Electronics")
+
+    # Inputs
+    duration = st.slider("🕒 Mission Duration (days)", 1, 1000, 180)
+    shielding = st.selectbox("🛡️ Shielding Level", ["None", "Light", "Heavy"])
+    sensitivity = st.selectbox("📦 Electronics Sensitivity", ["Standard", "Hardened", "Critical"])
+
+    # Sensitivity factors
+    sensitivity_factor = {
+        "Standard": 1.0,
+        "Hardened": 0.5,
+        "Critical": 2.0
+    }
+
+    # Shielding effectiveness
+    shielding_factor = {
+        "None": 1.0,
+        "Light": 0.6,
+        "Heavy": 0.3
+    }
+
+    # Base SEU rate per day (mock value)
+    base_seu_rate = 0.002  # Ups/day
+
+    # Calculate adjusted SEU rate
+    adjusted_rate = base_seu_rate * sensitivity_factor[sensitivity] * shielding_factor[shielding]
+    total_seus = adjusted_rate * duration
+
+    # Categorize risk
+    if total_seus < 1:
+        risk = "Low"
+        color = "green"
+    elif total_seus < 5:
+        risk = "Moderate"
+        color = "orange"
+    else:
+        risk = "High"
+        color = "red"
+
+    st.metric("📉 Estimated SEUs", f"{total_seus:.2f}")
+    st.success(f"⚠️ Failure Risk Level: {risk}")
+
+    # Visualization: Shielding vs SEU Rate
+    import matplotlib.pyplot as plt
+
+    st.subheader("📊 SEU Rate vs Shielding")
+
+    levels = ["None", "Light", "Heavy"]
+    rates = [base_seu_rate * sensitivity_factor[sensitivity] * shielding_factor[lev] * duration for lev in levels]
+
+    fig, ax = plt.subplots()
+    ax.bar(levels, rates, color=['red', 'orange', 'green'])
+    ax.set_ylabel("Total SEUs (bit flips)")
+    ax.set_title("Effect of Shielding on SEU Risk")
+    st.pyplot(fig)
+
+    # Explanation
+    st.markdown("""
+Cosmic rays, particularly high-energy protons and heavy ions, can disrupt electronics in space.  
+These **Single Event Upsets (SEUs)** can cause:
+- Memory bit flips
+- Logic faults
+- Temporary or permanent device failure
+
+**Radiation hardening** and **shielding** are key to reducing these effects in space missions.
+    """)
+
 
 # Tab 5: CR Data Explorer
 with tabs[4]:
