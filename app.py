@@ -37,7 +37,71 @@ tabs = st.tabs([
 with tabs[0]:
     st.subheader("Radiation Risk Calculator")
     st.info("This tool estimates the radiation dose and cancer risk for a space mission based on real-time solar particle flux and selected shielding.")
+    # Inputs
+    mission_days = st.slider("🕒 Mission Duration (days)", 1, 1000, 180)
+    shielding_material = st.selectbox("🛡️ Shielding Material", ["None", "Aluminum", "Polyethylene"])
 
+    # Real-time proton flux from NOAA
+    url = "https://services.swpc.noaa.gov/json/goes/primary/differential-proton-flux-1-day.json"
+
+    try:
+        data = requests.get(url).json()
+        flux = float(data[-1]['flux'])  # protons/cm²/s/sr
+        st.success(f"☀️ Live Proton Flux (≥10 MeV): {flux:.2e} protons/cm²/s/sr")
+    except:
+        flux = 100  # fallback if API fails
+        st.warning("⚠️ Unable to fetch live data. Using default flux: 100 p/cm²/s/sr")
+
+    # Simplified dose model
+    base_dose_per_day = flux * 0.00005  # empirical approximation
+    shield_factors = {'None': 1.0, 'Aluminum': 0.7, 'Polyethylene': 0.5}
+    daily_dose = base_dose_per_day * shield_factors[shielding_material]
+    total_dose = daily_dose * mission_days  # in mSv
+
+    # Cancer risk estimate
+    risk_percent = (total_dose / 1000) * 5  # linear ERR model
+
+    st.metric("☢️ Estimated Total Dose (mSv)", f"{total_dose:.2f}")
+    st.metric("⚠️ Estimated Cancer Risk", f"{risk_percent:.2f} %")
+
+    st.caption("ICRP model: 5% risk increase per 1 Sv of exposure. Not for clinical use.")
+
+    # Dose over time graph
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    st.subheader("📊 Dose Accumulation Over Time")
+    days = np.arange(1, mission_days + 1)
+    dose_over_time = daily_dose * days
+
+    fig, ax = plt.subplots()
+    ax.plot(days, dose_over_time, color='crimson')
+    ax.set_xlabel("Days")
+    ax.set_ylabel("Cumulative Dose (mSv)")
+    ax.set_title("Radiation Dose Accumulation")
+    st.pyplot(fig)
+
+    # Monte Carlo simulation
+    st.subheader("🎲 Monte Carlo Simulation (1000 Astronauts)")
+    simulated_doses = np.random.normal(loc=total_dose, scale=0.1 * total_dose, size=1000)
+
+    fig2, ax2 = plt.subplots()
+    ax2.hist(simulated_doses, bins=30, color='orange', edgecolor='black')
+    ax2.set_title("Simulated Dose Distribution")
+    ax2.set_xlabel("Total Dose (mSv)")
+    ax2.set_ylabel("Number of Astronauts")
+    st.pyplot(fig2)
+
+    # Shielding effectiveness table
+    import pandas as pd
+    st.subheader("🛡️ Shielding Material Effectiveness")
+
+    data_table = {
+        "Material": ["None", "Aluminum", "Polyethylene"],
+        "Approx. Dose Reduction (%)": [0, 30, 50]
+    }
+    df = pd.DataFrame(data_table)
+    st.dataframe(df)
 # Tab 2: Shower Map
 with tabs[1]:
     st.subheader("Cosmic Ray Shower Map (Coming Soon)")
