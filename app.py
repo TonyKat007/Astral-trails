@@ -114,7 +114,12 @@ with tabs[1]:
     st.info("Map currently shows **mock shower data**. Live data from observatories coming soon!")
 
     # Create base map
-    m = folium.Map(location=[20, 0], zoom_start=2, tiles="Stamen Terrain")
+    m = folium.Map(
+    location=[20, 0],
+    zoom_start=2,
+    tiles="https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png",
+    attr="Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL."
+)
 
     # Generate mock secondary showers
     for _ in range(25):
