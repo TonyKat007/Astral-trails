@@ -309,13 +309,131 @@ Real data from **AMS-02**, **Voyager**, or **CRDB** can be connected in later ve
     """)
 # Tab 6: Dose Comparison
 with tabs[5]:
-    st.subheader("Mission Dose Comparator (Coming Soon)")
-    st.info("Compare radiation exposure on the ISS, Moon, Mars, and interplanetary space.")
+    import matplotlib.pyplot as plt
+    import numpy as np
 
+    st.subheader("🛰️ Space Mission Radiation Dose Comparator")
+
+    # Predefined missions
+    missions = ["ISS (LEO)", "Lunar Orbit", "Lunar Surface", "Mars Transit", "Deep Space"]
+    daily_doses = [0.3, 0.5, 1.0, 1.8, 2.5]  # mSv/day (based on NASA data ranges)
+    durations = {
+        "Short (30 days)": 30,
+        "Medium (180 days)": 180,
+        "Long (900 days)": 900
+    }
+
+    duration_choice = st.selectbox("🕒 Mission Duration", list(durations.keys()))
+    days = durations[duration_choice]
+
+    total_doses = [dose * days for dose in daily_doses]
+
+    # Display table
+    import pandas as pd
+    df = pd.DataFrame({
+        "Mission": missions,
+        "Daily Dose (mSv)": daily_doses,
+        f"Total Dose for {days} days (mSv)": total_doses
+    })
+    st.dataframe(df)
+
+    # Plot
+    st.subheader("📊 Total Radiation Dose per Mission")
+
+    fig, ax = plt.subplots()
+    bars = ax.bar(missions, total_doses, color="mediumslateblue")
+    ax.set_ylabel("Total Dose (mSv)")
+    ax.set_title(f"Total Radiation Dose Over {days} Days")
+    ax.axhline(1000, color='red', linestyle='--', label="1 Sv Cancer Risk Threshold")
+    ax.legend()
+    st.pyplot(fig)
+
+    # Summary
+    st.markdown(f"""
+🔎 **Insights:**
+- **LEO (e.g., ISS)** is relatively safe due to Earth's magnetic shielding.
+- **Lunar & deep space** missions face **much higher radiation exposure**.
+- A **1 Sv dose** is considered to increase lifetime cancer risk by ~5%.
+
+This tool helps in comparing the risk factor across different mission environments.
+    """)
 # Tab 7: Space Weather
 with tabs[6]:
-    st.subheader("Space Weather Live (Coming Soon)")
-    st.info("Monitor real-time solar activity including flares, proton flux, and magnetic storms.")
+    import requests
+    import datetime
+    import matplotlib.pyplot as plt
+
+    st.subheader("🌞 Real-Time Space Weather Monitor")
+
+    # --- Proton Flux (≥10 MeV) ---
+    st.markdown("### ☢️ Proton Flux (≥10 MeV)")
+    try:
+        url_proton = "https://services.swpc.noaa.gov/json/goes/primary/differential-proton-flux-1-day.json"
+        proton_data = requests.get(url_proton).json()
+        times = [datetime.datetime.strptime(p["time_tag"], "%Y-%m-%dT%H:%M:%SZ") for p in proton_data if p["energy"] == ">=10 MeV"]
+        fluxes = [float(p["flux"]) for p in proton_data if p["energy"] == ">=10 MeV"]
+
+        fig, ax = plt.subplots()
+        ax.plot(times, fluxes, color='red')
+        ax.set_title("Proton Flux (GOES - ≥10 MeV)")
+        ax.set_ylabel("Flux (protons/cm²·s·sr)")
+        ax.set_xlabel("UTC Time")
+        ax.grid(True)
+        st.pyplot(fig)
+
+        if fluxes[-1] > 100:
+            st.warning("⚠️ Elevated proton flux — possible solar event in progress.")
+        else:
+            st.success("✅ Proton flux is at normal background levels.")
+    except:
+        st.error("Could not load proton flux data.")
+
+    # --- X-Ray Flux (Solar Flares) ---
+    st.markdown("### ⚡ X-Ray Flux (Solar Flares)")
+    try:
+        url_xray = "https://services.swpc.noaa.gov/json/goes/primary/xrays-1-day.json"
+        xray_data = requests.get(url_xray).json()
+        x_times = [datetime.datetime.strptime(x["time_tag"], "%Y-%m-%dT%H:%M:%SZ") for x in xray_data]
+        short = [float(x["flux_short"]) for x in xray_data]
+
+        fig, ax = plt.subplots()
+        ax.plot(x_times, short, color='orange')
+        ax.set_title("X-Ray Short Flux (GOES)")
+        ax.set_ylabel("Flux (W/m²)")
+        ax.set_xlabel("UTC Time")
+        ax.set_yscale("log")
+        ax.grid(True)
+        st.pyplot(fig)
+
+        if short[-1] > 1e-5:
+            st.warning("⚠️ Possible solar flare detected!")
+        else:
+            st.success("✅ No flare activity at the moment.")
+    except:
+        st.error("Could not load X-ray data.")
+
+    # --- Kp Index (Geomagnetic Storms) ---
+    st.markdown("### 🧭 Kp Index (Geomagnetic Storms)")
+    try:
+        url_kp = "https://services.swpc.noaa.gov/json/planetary_k_index_1m.json"
+        kp_data = requests.get(url_kp).json()
+        kp_times = [datetime.datetime.strptime(p["time_tag"], "%Y-%m-%dT%H:%M:%SZ") for p in kp_data]
+        kp_values = [float(p["k_index"]) for p in kp_data]
+
+        fig, ax = plt.subplots()
+        ax.plot(kp_times, kp_values, color='blue')
+        ax.set_title("Kp Index (NOAA)")
+        ax.set_ylabel("Kp")
+        ax.set_xlabel("UTC Time")
+        ax.grid(True)
+        st.pyplot(fig)
+
+        if kp_values[-1] >= 5:
+            st.warning("🌐 Geomagnetic storm conditions likely (Kp ≥ 5)")
+        else:
+            st.success("✅ Geomagnetic field is quiet.")
+    except:
+        st.error("Could not load Kp index data.")
 
 # Tab 8: Research Library
 with tabs[7]:
