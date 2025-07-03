@@ -1,5 +1,12 @@
 import streamlit as st
 from datetime import datetime
+import requests
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import folium
+import random
+from streamlit_folium import folium_static
 
 # App configuration
 st.set_page_config(
@@ -33,47 +40,35 @@ tabs = st.tabs([
     "Upload & Analyze Your Data"
 ])
 
-# Tab 1: Radiation Risk Calculator
+# ========== TAB 1: Radiation Risk Calculator ==========
 with tabs[0]:
     st.subheader("Radiation Risk Calculator")
     st.info("This tool estimates the radiation dose and cancer risk for a space mission based on real-time solar particle flux and selected shielding.")
-    # Inputs
     mission_days = st.slider("Mission Duration (days)", 1, 1000, 180)
     shielding_material = st.selectbox("Shielding Material", ["None", "Aluminum", "Polyethylene"])
 
-    # Real-time proton flux from NOAA
     url = "https://services.swpc.noaa.gov/json/goes/primary/integral-protons-3-day.json"
-
     try:
         data = requests.get(url).json()
-        flux = float(data[-1]['flux'])  # protons/cm²/s/sr
+        flux = float(data[-1]['flux'])
         st.success(f"Live Proton Flux (≥10 MeV): {flux:.2e} protons/cm²/s/sr")
     except:
-        flux = 100  # fallback if API fails
+        flux = 100
         st.warning("Unable to fetch live data. Using default flux: 100 p/cm²/s/sr")
 
-    # Simplified dose model
-    base_dose_per_day = flux * 0.00005  # empirical approximation
+    base_dose_per_day = flux * 0.00005
     shield_factors = {'None': 1.0, 'Aluminum': 0.7, 'Polyethylene': 0.5}
     daily_dose = base_dose_per_day * shield_factors[shielding_material]
-    total_dose = daily_dose * mission_days  # in mSv
-
-    # Cancer risk estimate
-    risk_percent = (total_dose / 1000) * 5  # linear ERR model
+    total_dose = daily_dose * mission_days
+    risk_percent = (total_dose / 1000) * 5
 
     st.metric("☢️ Estimated Total Dose (mSv)", f"{total_dose:.2f}")
     st.metric("⚠️ Estimated Cancer Risk", f"{risk_percent:.2f} %")
-
     st.caption("ICRP model: 5% risk increase per 1 Sv of exposure. Not for clinical use.")
-
-    # Dose over time graph
-    import matplotlib.pyplot as plt
-    import numpy as np
 
     st.subheader("Dose Accumulation Over Time")
     days = np.arange(1, mission_days + 1)
     dose_over_time = daily_dose * days
-
     fig, ax = plt.subplots()
     ax.plot(days, dose_over_time, color='crimson')
     ax.set_xlabel("Days")
@@ -81,10 +76,8 @@ with tabs[0]:
     ax.set_title("Radiation Dose Accumulation")
     st.pyplot(fig)
 
-    # Monte Carlo simulation
     st.subheader("Monte Carlo Simulation (1000 Astronauts)")
     simulated_doses = np.random.normal(loc=total_dose, scale=0.1 * total_dose, size=1000)
-
     fig2, ax2 = plt.subplots()
     ax2.hist(simulated_doses, bins=30, color='orange', edgecolor='black')
     ax2.set_title("Simulated Dose Distribution")
@@ -92,55 +85,24 @@ with tabs[0]:
     ax2.set_ylabel("Number of Astronauts")
     st.pyplot(fig2)
 
-    # Shielding effectiveness table
-    import pandas as pd
     st.subheader("Shielding Material Effectiveness")
-
-    data_table = {
-        "Material": ["None", "Aluminum", "Polyethylene"],
-        "Approx. Dose Reduction (%)": [0, 30, 50]
-    }
-    df = pd.DataFrame(data_table)
+    df = pd.DataFrame({"Material": ["None", "Aluminum", "Polyethylene"], "Approx. Dose Reduction (%)": [0, 30, 50]})
     st.dataframe(df)
-# Tab 2: Shower Map
+
+# ========== TAB 2: Live Cosmic Ray Shower Map ==========
 with tabs[1]:
-    from streamlit_folium import folium_static
-    import folium
-    import random
-
     st.subheader("Live Cosmic Ray Shower Map")
-
-    # Mock: Generate fake cosmic ray shower locations
     st.info("Map currently shows **mock shower data**. Live data from observatories coming soon!")
-
-    # Create base map
-    m = folium.Map(
-    location=[20, 0],
-    zoom_start=2,
-    tiles="https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png",
-    attr="Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL."
-)
-
-    # Generate mock secondary showers
+    m = folium.Map(location=[20, 0], zoom_start=2, tiles="https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png",
+                   attr="Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.")
     for _ in range(25):
-        lat = random.uniform(-60, 60)
-        lon = random.uniform(-180, 180)
+        lat, lon = random.uniform(-60, 60), random.uniform(-180, 180)
         intensity = random.choice(['Low', 'Moderate', 'High'])
         color = {'Low': 'green', 'Moderate': 'orange', 'High': 'red'}[intensity]
-
-        folium.CircleMarker(
-            location=[lat, lon],
-            radius=6,
-            popup=f"Secondary Shower\nIntensity: {intensity}",
-            color=color,
-            fill=True,
-            fill_opacity=0.7
-        ).add_to(m)
-
+        folium.CircleMarker(location=[lat, lon], radius=6, popup=f"Shower\nIntensity: {intensity}", color=color,
+                            fill=True, fill_opacity=0.7).add_to(m)
     folium_static(m)
-
-    st.caption("Data simulated for demonstration. Future version will include real-time showers from cosmic ray arrays.")
-
+    st.caption("Simulated data. Future version will include real-time showers from cosmic ray arrays.")
 # Tab 3: Biological Effects
 with tabs[2]:
     st.subheader("Biological Effects of Radiation")
