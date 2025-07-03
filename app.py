@@ -466,22 +466,22 @@ with tabs[7]:
         "Title": [
             "Comparative study of effects of cosmic rays on the earth’s atmospheric processes ",
             "Beyond Earthly Limits: Protection against Cosmic Radiation through Biological Response Pathways",
-            "The effect of cosmic rays on biological systems"
-            "Microprocessor technology and single event upset susceptibility"
+            "The effect of cosmic rays on biological systems",
+            "Microprocessor technology and single event upset susceptibility",
             "Impact Of Cosmic Rays On Satellite Communications"
         ],
         "Authors": [
             "Arshad Rasheed Ganai and Dr. Suryansh Choudhary",
             "Zahida Sultanova and Saleh Sultansoy",
-            "N. K. Belisheva, H. Lammer, H. K. Biernat and E. V. Vashenuyk"
-            "L.D. Akers"
+            "N. K. Belisheva, H. Lammer, H. K. Biernat and E. V. Vashenuyk",
+            "L.D. Akers",
             "Dr. Premlal P.D"
         ],
         "Link": [
             "https://www.physicsjournal.in/archives/2020.v2.i1.A.27/comparative-study-of-effects-of-cosmic-rays-on-the-earthrsquos-atmospheric-processes",
             "https://arxiv.org/pdf/2405.12151",
-            "https://www.researchgate.net/publication/235958260_The_effect_of_cosmic_rays_on_biological_systems_-_An_investigation_during_GLE_events"
-            "https://klabs.org/DEI/References/avionics/small_sat_conference/1996/ldakers.pdf"
+            "https://www.researchgate.net/publication/235958260_The_effect_of_cosmic_rays_on_biological_systems_-_An_investigation_during_GLE_events",
+            "https://klabs.org/DEI/References/avionics/small_sat_conference/1996/ldakers.pdf",
             "https://www.iosrjournals.org/iosr-jece/papers/Vol.%2019%20Issue%202/Ser-1/D1902013337.pdf"
         ],
         "Year": [2020, 2024, 2012, 1996, 2024],
