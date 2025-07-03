@@ -466,40 +466,28 @@ with tabs[7]:
         file_name="example_paper.pdf",
         mime="application/pdf"
     )
-# Tab 9: cosmic ray data explorer
-with tabs[8]:
+# Tab 9: cosmic ray data explorerwith tabs[8]:
     st.subheader("📤 Upload & Analyze Your Own Cosmic Ray Dataset")
-
     uploaded_file = st.file_uploader("Upload your CSV file (must include 'Energy' and 'Flux' columns, max 2MB)", type=["csv"])
-
     if uploaded_file is not None:
         if uploaded_file.size > 2 * 1024 * 1024:
             st.error("File too large. Please upload a file smaller than 2MB.")
         else:
-            import pandas as pd
-            import matplotlib.pyplot as plt
-
             try:
                 df = pd.read_csv(uploaded_file)
                 if 'Energy' in df.columns and 'Flux' in df.columns:
                     st.success("File uploaded and read successfully!")
-
                     st.markdown("### 📄 Preview of Uploaded Data")
                     st.dataframe(df.head())
-
-                    st.subheader("📈 Flux vs. Energy Plot")
                     log_scale = st.checkbox("Log scale", value=True)
-
                     fig, ax = plt.subplots()
                     ax.plot(df['Energy'], df['Flux'], marker='o', linestyle='-', color='blue')
                     ax.set_xlabel("Energy")
                     ax.set_ylabel("Flux")
                     ax.set_title("Uploaded Cosmic Ray Spectrum")
-
                     if log_scale:
                         ax.set_yscale("log")
                         ax.set_xscale("log")
-
                     ax.grid(True, which='both', linestyle='--', alpha=0.5)
                     st.pyplot(fig)
                 else:
@@ -507,10 +495,11 @@ with tabs[8]:
             except Exception as e:
                 st.error(f"Error reading file: {e}")
 
-# Footer
+# ========== FOOTER ==========
 st.markdown(f"""
 ---
 <p style='text-align: center; color: gray'>
 Built by Tanmay Rajput | Last updated: {datetime.today().strftime('%B %d, %Y')}
 </p>
 """, unsafe_allow_html=True)
+
