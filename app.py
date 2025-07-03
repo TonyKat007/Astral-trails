@@ -568,8 +568,8 @@ with tabs[8]:
 
                 st.download_button("⬇️ Download CSV", data=df.to_csv(index=False), file_name=f"{source}_{particle_code[particle]}_flux.csv", mime="text/csv")
     
-    except Exception as e:
-        st.error(f"Failed to retrieve data: {e}")
+        except Exception as e:
+            st.error(f"Failed to retrieve data: {e}")
 # Footer
 st.markdown(f"""
 ---
