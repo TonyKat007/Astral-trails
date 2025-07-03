@@ -372,7 +372,7 @@ with tabs[6]:
     # --- X-Ray Flux (Solar Flares) ---
     st.markdown("### ⚡ X-Ray Flux (Solar Flares)")
     try:
-        url_xray = "https://services.swpc.noaa.gov/json/goes/primary/xrays-1-day.json"
+        url_xray = "https://services.swpc.noaa.gov/json/goes/primary/xrays-3-day.json"
         xray_data = requests.get(url_xray).json()
         x_times = [datetime.datetime.strptime(x["time_tag"], "%Y-%m-%dT%H:%M:%SZ") for x in xray_data]
         short = [float(x["flux_short"]) for x in xray_data]
@@ -396,7 +396,7 @@ with tabs[6]:
     # --- Kp Index (Geomagnetic Storms) ---
     st.markdown("### 🧭 Kp Index (Geomagnetic Storms)")
     try:
-        url_kp = "https://services.swpc.noaa.gov/json/planetary_k_index_1m.json"
+        url_kp = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json"
         kp_data = requests.get(url_kp).json()
         kp_times = [datetime.datetime.strptime(p["time_tag"], "%Y-%m-%dT%H:%M:%SZ") for p in kp_data]
         kp_values = [float(p["k_index"]) for p in kp_data]
