@@ -349,7 +349,7 @@ with tabs[6]:
     # --- Proton Flux (≥10 MeV) ---
     st.markdown("### ☢️ Proton Flux (≥10 MeV)")
     try:
-        url_proton = "https://services.swpc.noaa.gov/json/goes/primary/differential-proton-flux-1-day.json"
+        url_proton = "https://services.swpc.noaa.gov/json/goes/primary/integral-protons-3-day.json"
         proton_data = requests.get(url_proton).json()
         times = [datetime.datetime.strptime(p["time_tag"], "%Y-%m-%dT%H:%M:%SZ") for p in proton_data if p["energy"] == ">=10 MeV"]
         fluxes = [float(p["flux"]) for p in proton_data if p["energy"] == ">=10 MeV"]
