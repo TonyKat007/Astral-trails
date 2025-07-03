@@ -437,7 +437,7 @@ with tabs[6]:
 
 # Tab 8: Research Library
 with tabs[7]:
-     st.subheader("📚 Research Paper Library")
+    st.subheader("📚 Research Paper Library")
 
     st.markdown("""
     Browse handpicked research papers on cosmic rays, radiation health, and space missions.
