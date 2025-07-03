@@ -269,6 +269,22 @@ These **Single Event Upsets (SEUs)** can cause:
     """)
 
 
+#Monte Carlo simulation of 1000 devices and the effect on them
+    
+st.subheader("🎲 Monte Carlo Simulation (1000 Devices)")
+simulated_failures = np.random.normal(loc=total_seus, scale=0.2 * total_seus, size=1000)
+simulated_failures = np.clip(simulated_failures, 0, None)  # no negative SEUs
+
+fig2, ax2 = plt.subplots()
+ax2.hist(simulated_failures, bins=30, color='purple', edgecolor='black')
+ax2.set_title("Simulated SEU Distribution Across Devices")
+ax2.set_xlabel("Total SEUs")
+ax2.set_ylabel("Number of Devices")
+st.pyplot(fig2)
+
+st.caption("Simulates variation in SEU impact across 1000 similar devices.")
+
+
 # Tab 5: CR Data Explorer
 with tabs[4]:
     import numpy as np
