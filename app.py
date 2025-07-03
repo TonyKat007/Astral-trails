@@ -399,7 +399,7 @@ with tabs[6]:
         url_kp = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json"
         kp_data = requests.get(url_kp).json()
         kp_times = [datetime.datetime.strptime(p["time_tag"], "%Y-%m-%dT%H:%M:%SZ") for p in kp_data]
-        kp_values = [float(p["k_index"]) for p in kp_data]
+        kp_values = [float(p["Kp"]) for p in kp_data]
 
         fig, ax = plt.subplots()
         ax.plot(kp_times, kp_values, color='blue')
