@@ -395,26 +395,40 @@ with tabs[6]:
 
     # --- Kp Index (Geomagnetic Storms) ---
     st.markdown("### 🧭 Kp Index (Geomagnetic Storms)")
-    try:
-        url_kp = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json"
-        kp_data = requests.get(url_kp).json()
-        kp_times = [datetime.datetime.strptime(p["time_tag"], "%Y-%m-%dT%H:%M:%SZ") for p in kp_data]
-        kp_values = [float(p["Kp"]) for p in kp_data]
+    
+try:
+    url_kp = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json"
+    raw_data = requests.get(url_kp).json()
 
-        fig, ax = plt.subplots()
-        ax.plot(kp_times, kp_values, color='blue')
-        ax.set_title("Kp Index (NOAA)")
-        ax.set_ylabel("Kp")
-        ax.set_xlabel("UTC Time")
-        ax.grid(True)
-        st.pyplot(fig)
+    # First row is header
+    header = raw_data[0]
+    rows = raw_data[1:]
 
-        if kp_values[-1] >= 5:
-            st.warning("🌐 Geomagnetic storm conditions likely (Kp ≥ 5)")
-        else:
-            st.success("✅ Geomagnetic field is quiet.")
-    except:
-        st.error("Could not load Kp index data.")
+    # Convert to DataFrame
+    df_kp = pd.DataFrame(rows, columns=header)
+
+    # Convert datetime and Kp to usable types
+    df_kp["time_tag"] = pd.to_datetime(df_kp["time_tag"])
+    df_kp["Kp"] = pd.to_numeric(df_kp["Kp"], errors='coerce')
+
+    # Plot
+    fig, ax = plt.subplots()
+    ax.plot(df_kp["time_tag"], df_kp["Kp"], color='blue')
+    ax.set_title("NOAA Kp Index (Last 3 Days)")
+    ax.set_ylabel("Kp Value")
+    ax.set_xlabel("UTC Time")
+    ax.grid(True)
+    st.pyplot(fig)
+
+    # Last Kp reading warning
+    latest_kp = df_kp["Kp"].iloc[-1]
+    if latest_kp >= 5:
+        st.warning(f"🌐 Geomagnetic storm conditions likely (Kp = {latest_kp})")
+    else:
+        st.success(f"✅ Geomagnetic field is quiet (Kp = {latest_kp})")
+
+except Exception as e:
+    st.error(f"Could not load Kp index data: {e}")
 
 # Tab 8: Research Library
 with tabs[7]:
