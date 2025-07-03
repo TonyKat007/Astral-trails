@@ -470,6 +470,7 @@ with tabs[7]:
         mime="application/pdf"
     )
 # Tab 9: cosmic ray data explorerwith tabs[8]:
+with tabs[8]:
     st.subheader("📤 Upload & Analyze Your Own Cosmic Ray Dataset")
     uploaded_file = st.file_uploader("Upload your CSV file (must include 'Energy' and 'Flux' columns, max 2MB)", type=["csv"])
     if uploaded_file is not None:
