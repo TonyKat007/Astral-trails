@@ -53,7 +53,7 @@ with tabs[0]:
         df = pd.DataFrame(data)
         df['time_tag'] = pd.to_datetime(df['time_tag'])
         df['flux'] = pd.to_numeric(df['flux'], errors='coerce')
-        flux==df['flux'].iloc[-1]
+        flux=df['flux'].iloc[-1]
         st.success(f"Live Proton Flux (≥10 MeV): {flux:.2e} protons/cm²/s/sr")
     except:
         flux = 100
