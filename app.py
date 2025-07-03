@@ -440,7 +440,7 @@ with tabs[7]:
     st.subheader("Research Paper Library (Coming Soon)")
     st.info("Browse curated NASA/ESA research papers related to cosmic radiation.")
 
-# Tab 9: Upload Data
+# Tab 9: cosmic ray data explorer
 with tabs[8]:
     st.subheader("Upload & Analyze Your Data (Coming Soon)")
     st.info("Upload your own radiation measurement data and analyze it interactively.")
