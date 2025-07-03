@@ -375,7 +375,7 @@ with tabs[6]:
         url_xray = "https://services.swpc.noaa.gov/json/goes/primary/xrays-3-day.json"
         xray_data = requests.get(url_xray).json()
         x_times = [datetime.datetime.strptime(x["time_tag"], "%Y-%m-%dT%H:%M:%SZ") for x in xray_data]
-        short = [float(x["flux_short"]) for x in xray_data]
+        short = [float(x["flux"]) for x in xray_data]
 
         fig, ax = plt.subplots()
         ax.plot(x_times, short, color='orange')
