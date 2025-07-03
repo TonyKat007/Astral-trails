@@ -437,9 +437,51 @@ with tabs[6]:
 
 # Tab 8: Research Library
 with tabs[7]:
-    st.subheader("Research Paper Library (Coming Soon)")
-    st.info("Browse curated NASA/ESA research papers related to cosmic radiation.")
+     st.subheader("📚 Research Paper Library")
 
+    st.markdown("""
+    Browse handpicked research papers on cosmic rays, radiation health, and space missions.
+    """)
+
+    # Example static paper list
+    import pandas as pd
+
+    papers = pd.DataFrame({
+        "Title": [
+            "Galactic Cosmic Rays: Overview and Shielding",
+            "Cancer Risk Estimates for Deep Space Missions",
+            "Radiation Effects on Electronics in Space"
+        ],
+        "Authors": [
+            "M. Smith et al.",
+            "A. Johnson et al.",
+            "Y. Chen et al."
+        ],
+        "Link": [
+            "https://arxiv.org/abs/astro-ph/0000001",
+            "https://arxiv.org/abs/astro-ph/0000002",
+            "https://arxiv.org/abs/astro-ph/0000003"
+        ],
+        "Year": [2021, 2019, 2023],
+        "Tags": ["Shielding", "Biology", "Electronics"]
+    })
+
+    tag = st.selectbox("Filter by Tag", ["All", "Shielding", "Biology", "Electronics"])
+    if tag != "All":
+        filtered = papers[papers["Tags"] == tag]
+    else:
+        filtered = papers
+
+    st.dataframe(filtered)
+
+    # Add download example
+    st.markdown("### 📎 Example Paper Download")
+    st.download_button(
+        "Download Example Paper (PDF)",
+        data=b"%PDF-1.4 ... (fake content)",
+        file_name="example_paper.pdf",
+        mime="application/pdf"
+    )
 # Tab 9: cosmic ray data explorer
 with tabs[8]:
     st.set_page_config(page_title="Cosmic Ray Data Explorer", layout="wide")
