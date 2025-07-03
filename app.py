@@ -42,7 +42,7 @@ with tabs[0]:
     shielding_material = st.selectbox("Shielding Material", ["None", "Aluminum", "Polyethylene"])
 
     # Real-time proton flux from NOAA
-    url = "https://services.swpc.noaa.gov/json/goes/primary/differential-proton-flux-1-day.json"
+    url = "https://services.swpc.noaa.gov/json/goes/primary/integral-protons-3-day.json"
 
     try:
         data = requests.get(url).json()
