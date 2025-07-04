@@ -110,6 +110,7 @@ with tabs[1]:
                             fill=True, fill_opacity=0.7).add_to(m)
     st_folium(m, width=700)
     st.caption("Simulated data. Future version will include real-time showers from cosmic ray arrays.")
+
 # Tab 3: Biological Effects
 with tabs[2]:
     import os
@@ -329,41 +330,61 @@ with tabs[3]:
 # Tab 5: CR Data Explorer
 with tabs[4]:
     import numpy as np
-    import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
-    st.subheader("📈 Cosmic Ray Data Explorer")
+st.subheader("📈 Cosmic Ray Data Explorer")
 
-    source = st.selectbox("🔬 Select Data Source", ["AMS-02", "Voyager 1", "Mock Data"])
-    particle = st.selectbox("🧪 Select Particle Type", ["Protons", "Helium Nuclei", "Iron Nuclei"])
+# --- Sidebar settings or inline selectors ---
+source = st.selectbox("🔬 Select Data Source", ["AMS-02", "Voyager 1", "Mock Data"])
+particle = st.selectbox("🧪 Select Particle Type", ["Protons", "Helium Nuclei", "Iron Nuclei"])
+log_scale = st.checkbox("🔄 Use Log Scale", value=True)
+energy_range = st.slider("🎚️ Energy Range (MeV)", 1, 1000, (10, 500))
 
-    # Generate sample spectra (mock data)
-    energy = np.logspace(0.1, 3, 50)  # MeV
-    if particle == "Protons":
-        flux = 1e4 * energy**-2.7
-    elif particle == "Helium Nuclei":
-        flux = 1e3 * energy**-2.6
-    else:
-        flux = 200 * energy**-2.5
+# --- Generate sample spectra ---
+energy = np.logspace(0.1, 3, 200)  # MeV
+mask = (energy >= energy_range[0]) & (energy <= energy_range[1])
+energy = energy[mask]
 
-    fig, ax = plt.subplots()
-    ax.loglog(energy, flux, label=f"{particle} Spectrum")
-    ax.set_xlabel("Energy (MeV)")
-    ax.set_ylabel("Flux (particles/m²·s·sr·MeV)")
-    ax.set_title(f"Cosmic Ray Spectrum - {source}")
-    ax.grid(True, which='both', linestyle='--', linewidth=0.5)
-    ax.legend()
+if particle == "Protons":
+    flux = 1e4 * energy**-2.7
+    color = "#3498db"
+elif particle == "Helium Nuclei":
+    flux = 1e3 * energy**-2.6
+    color = "#e67e22"
+else:
+    flux = 200 * energy**-2.5
+    color = "#9b59b6"
 
-    st.pyplot(fig)
+# --- Plot ---
+fig, ax = plt.subplots(figsize=(8, 5))
 
+if log_scale:
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+
+ax.plot(energy, flux, label=f"{particle}", linewidth=2.5, color=color)
+ax.set_xlabel("Energy (MeV)", fontsize=12)
+ax.set_ylabel("Flux (particles/m²·s·sr·MeV)", fontsize=12)
+ax.set_title(f"Cosmic Ray Spectrum – {source}", fontsize=14)
+ax.grid(True, which='both', linestyle='--', linewidth=0.5, alpha=0.7)
+ax.legend()
+
+st.pyplot(fig)
+
+# --- Description ---
+with st.expander("🧠 About Cosmic Ray Spectra"):
     st.markdown("""
-📡 **Cosmic Ray Spectra** represent the distribution of particle flux over different energies.  
-These spectra vary based on:
-- Particle type (proton, helium, etc.)
-- Source (e.g., solar, galactic, extragalactic)
-- Location (Earth orbit vs interstellar)
+- **Cosmic Ray Spectra** describe how particle intensity varies with energy.
+- Different **particles** (e.g., protons vs iron nuclei) have different shapes due to acceleration mechanisms.
+- **Data Sources**:
+    - **AMS-02** (on the ISS) focuses on precise low-energy data.
+    - **Voyager 1** measures interstellar spectra beyond the heliopause.
+    - **Mock Data** here mimics realistic power-law falloff.
+""")
 
-Real data from **AMS-02**, **Voyager**, or **CRDB** can be connected in later versions.
-    """)
+# --- Additional context ---
+st.caption("🌌 Spectra shapes hint at cosmic origin, magnetic effects, and energy losses across space.")
+
 # Tab 6: Dose Comparison
 with tabs[5]:
     import matplotlib.pyplot as plt
