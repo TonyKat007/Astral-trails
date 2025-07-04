@@ -487,20 +487,35 @@ with tabs[6]:
 import streamlit as st
 import pandas as pd
 
-st.subheader("🧭 Geomagnetic Kp Index (From Local File)")
+st.subheader("🧭 Geomagnetic Kp Index (From Local JSON File)")
 
-kp_file_path = "C:\Users\zeba\Downloads\planetary_k_index_1m.json"  
+# ✅ Use escaped path or raw string
+kp_file_path = r"C:\Users\zeba\Downloads\planetary_k_index_1m.json"
 
 try:
-    
-    kp_df = pd.read_csv(kp_file_path)
+    # Load JSON file
+    kp_data = pd.read_json(kp_file_path)
 
-    # Parse time and ensure Kp is numeric
+    # If it's a list of dicts (like NOAA format), convert to DataFrame
+    if isinstance(kp_data.iloc[0], dict):
+        kp_df = pd.DataFrame(kp_data.tolist())
+    else:
+        kp_df = kp_data
+
+    # Ensure correct column names (adjust if different)
     kp_df['time_tag'] = pd.to_datetime(kp_df['time_tag'], errors='coerce')
     kp_df['Kp'] = pd.to_numeric(kp_df['Kp'], errors='coerce')
 
-    # Drop rows with missing values
-    kp_df = k_
+    kp_df = kp_df.dropna(subset=['time_tag', 'Kp'])
+    kp_df = kp_df.sort_values('time_tag')
+
+    # Plot
+    st.line_chart(kp_df.rename(columns={'time_tag': 'index'}).set_index('index')[['Kp']])
+
+except FileNotFoundError:
+    st.error(f"File not found: `{kp_file_path}`. Please check the path.")
+except Exception as e:
+    st.warning(f"Error loading Kp index data: {e}")
 
 # Tab 8: Research Library
 with tabs[7]:
