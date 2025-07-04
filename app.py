@@ -1,5 +1,5 @@
 import streamlit as st
-from datetime import datetime
+import datetime
 import requests
 import numpy as np
 import pandas as pd
@@ -517,7 +517,7 @@ with tabs[8]:
 st.markdown(f"""
 ---
 <p style='text-align: center; color: gray'>
-Built by Tanmay Rajput | Last updated: {datetime.now().strftime('%B %d, %Y')}
+Built by Tanmay Rajput | Last updated: {datetime.datetime.now().strftime('%B %d, %Y')}
 </p>
 """, unsafe_allow_html=True)
 
