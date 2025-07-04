@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 import folium
 import random
 from streamlit_folium import st_folium
+import os
+from pathlib import Path
+
 
 # App configuration
 st.set_page_config(
@@ -108,6 +111,8 @@ with tabs[1]:
     st.caption("Simulated data. Future version will include real-time showers from cosmic ray arrays.")
 # Tab 3: Biological Effects
 with tabs[2]:
+    import os
+    from pathlib import Path
     st.subheader("Biological Effects of Radiation over Time")
 
     # Separator
