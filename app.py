@@ -9,6 +9,7 @@ import random
 from streamlit_folium import st_folium
 import os
 from pathlib import Path
+import plotly.graph_objects as go
 
 
 # App configuration
