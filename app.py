@@ -233,7 +233,7 @@ with tabs[2]:
         ]
     })
     st.dataframe(df)
-
+    
 # Tab 4: Effects on Electronics
 with tabs[3]:
     st.subheader("💻 Effects of Cosmic Radiation on Electronics")
