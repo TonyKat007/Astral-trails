@@ -6,7 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import folium
 import random
-from streamlit_folium import folium_static
+from streamlit_folium import st_folium
 
 # App configuration
 st.set_page_config(
@@ -104,7 +104,7 @@ with tabs[1]:
         color = {'Low': 'green', 'Moderate': 'orange', 'High': 'red'}[intensity]
         folium.CircleMarker(location=[lat, lon], radius=6, popup=f"Shower\nIntensity: {intensity}", color=color,
                             fill=True, fill_opacity=0.7).add_to(m)
-    folium_static(m)
+    st_folium(m, width=700)
     st.caption("Simulated data. Future version will include real-time showers from cosmic ray arrays.")
 # Tab 3: Biological Effects
 with tabs[2]:
@@ -517,7 +517,7 @@ with tabs[8]:
 st.markdown(f"""
 ---
 <p style='text-align: center; color: gray'>
-Built by Tanmay Rajput | Last updated: {datetime.today().strftime('%B %d, %Y')}
+Built by Tanmay Rajput | Last updated: {datetime.now().strftime('%B %d, %Y')}
 </p>
 """, unsafe_allow_html=True)
 
