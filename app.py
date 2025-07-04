@@ -379,25 +379,21 @@ with tabs[4]:
 with tabs[5]:
     import matplotlib.pyplot as plt
     import numpy as np
+    import pandas as pd
 
     st.subheader("🛰️ Space Mission Radiation Dose Comparator")
 
     # Predefined missions
     missions = ["ISS (LEO)", "Lunar Orbit", "Lunar Surface", "Mars Transit", "Deep Space"]
     daily_doses = [0.3, 0.5, 1.0, 1.8, 2.5]  # mSv/day (based on NASA data ranges)
-    durations = {
-        "Short (30 days)": 30,
-        "Medium (180 days)": 180,
-        "Long (900 days)": 900
-    }
 
-    duration_choice = st.selectbox("🕒 Mission Duration", list(durations.keys()))
-    days = durations[duration_choice]
+    # 🔄 Replacing dropdown with a slider for custom duration
+    days = st.slider("🕒 Select Mission Duration (days)", min_value=1, max_value=1000, value=180, step=1)
 
+    # Compute total doses
     total_doses = [dose * days for dose in daily_doses]
 
     # Display table
-    import pandas as pd
     df = pd.DataFrame({
         "Mission": missions,
         "Daily Dose (mSv)": daily_doses,
@@ -407,7 +403,6 @@ with tabs[5]:
 
     # Plot
     st.subheader("📊 Total Radiation Dose per Mission")
-
     fig, ax = plt.subplots()
     bars = ax.bar(missions, total_doses, color="mediumslateblue")
     ax.set_ylabel("Total Dose (mSv)")
@@ -425,6 +420,7 @@ with tabs[5]:
 
 This tool helps in comparing the risk factor across different mission environments.
     """)
+
 # Tab 7: Space Weather
 with tabs[6]:
     import requests
