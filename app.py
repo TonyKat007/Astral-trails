@@ -443,6 +443,43 @@ with tabs[6]:
     import matplotlib.pyplot as plt
 
     st.subheader("🌞 Real-Time Space Weather Monitor")
+    # --- Solar Flare Map (Mocked Locations) ---
+
+st.markdown("### ☀️ Solar Flare Activity Map")
+
+st.info("Note: Solar flare positions shown are mock data for visualization purposes only. Real solar flare coordinates are not provided in GOES public feeds.")
+
+# Create map centered around equator (Sun-facing view concept)
+flare_map = folium.Map(location=[0, 0], zoom_start=2, tiles="CartoDB positron")
+
+# Simulated flare data (latitude, longitude, class)
+mock_flares = [
+    {"lat": 10.5, "lon": 75.3, "class": "M"},
+    {"lat": -8.2, "lon": -60.1, "class": "C"},
+    {"lat": 23.7, "lon": 140.9, "class": "X"},
+    {"lat": -15.1, "lon": 30.4, "class": "C"},
+    {"lat": 5.4, "lon": -120.3, "class": "M"}
+]
+
+# Color coding
+flare_colors = {
+    "C": "green",
+    "M": "orange",
+    "X": "red"
+}
+
+for flare in mock_flares:
+    folium.CircleMarker(
+        location=[flare["lat"], flare["lon"]],
+        radius=7,
+        popup=f"Class {flare['class']} Flare",
+        color=flare_colors[flare["class"]],
+        fill=True,
+        fill_opacity=0.8
+    ).add_to(flare_map)
+
+folium_static(flare_map)
+
 
     # --- Proton Flux (≥10 MeV) ---
     st.markdown("### ☢️ Proton Flux (≥10 MeV)")
