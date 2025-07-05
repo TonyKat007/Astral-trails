@@ -220,16 +220,37 @@ with tabs[2]:
     
     st.plotly_chart(fig, use_container_width=True)
 
-    # Table: Organ-specific susceptibility
+    # Enhanced Table: Organ-specific susceptibility with treatments and research
     st.subheader("Organ Susceptibility (Generalized)")
+    
     df = pd.DataFrame({
         "Organ": ["Bone Marrow", "GI Tract", "Skin", "Brain", "Reproductive Organs"],
         "Effect at ≥50 mSv": [
-            "Reduced blood cell count", "Nausea, diarrhea", "Burns, hair loss",
-            "Cognitive impairment", "Sterility"
+            "Reduced blood cell count",
+            "Nausea, diarrhea",
+            "Burns, hair loss",
+            "Cognitive impairment",
+            "Sterility"
+        ],
+        "Possible Treatment / Mitigation": [
+            "Bone marrow transplant, G-CSF therapy",
+            "Hydration, antiemetics, gut microbiota restoration",
+            "Topical steroids, wound care, regenerative creams",
+            "Neuroprotective agents, cognitive therapy",
+            "Hormone therapy, sperm/egg preservation"
+        ],
+        "Related Research": [
+            "[NCBI](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4368524/)",
+            "[NIH](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2861979/)",
+            "[MDPI](https://www.mdpi.com/2072-6694/13/14/3458)",
+            "[Nature](https://www.nature.com/articles/s41598-019-42045-3)",
+            "[Springer](https://link.springer.com/article/10.1007/s11154-021-09672-2)"
         ]
     })
-    st.dataframe(df)
+    
+    st.markdown("Hover or click the links in the 'Related Research' column for more information.")
+    st.dataframe(df, use_container_width=True)
+
     
 # Tab 4: Effects on Electronics
 with tabs[3]:
