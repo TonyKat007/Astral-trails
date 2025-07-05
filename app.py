@@ -592,7 +592,7 @@ with tabs[7]:
         st.write(f"[Read Paper]({row['Link']})")
         st.write("---")
 
-    st.markdown("### 📎 Example Paper Download")
+    st.markdown("### Example Paper Download")
     st.download_button(
         "Download Example Paper (PDF)",
         data=b"%PDF-1.4 ... (fake content)",
@@ -612,7 +612,7 @@ with tabs[8]:
                 df = pd.read_csv(uploaded_file)
                 if 'Energy' in df.columns and 'Flux' in df.columns:
                     st.success("File uploaded and read successfully!")
-                    st.markdown("### 📄 Preview of Uploaded Data")
+                    st.markdown("### Preview of Uploaded Data")
                     st.dataframe(df.head())
                     log_scale = st.checkbox("Log scale", value=True)
                     fig, ax = plt.subplots()
