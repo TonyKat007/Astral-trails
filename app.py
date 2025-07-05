@@ -563,11 +563,22 @@ with tabs[7]:
         "Year": [2020, 2024, 2012, 1996, 2024],
         "Tags": ["Atmosphere", "Biology", "Biology", "Electronics", "Electronics"],
         "Summary": [
-            "This paper compares how cosmic rays affect the Earth's weather and atmospheric conditions.",
-            "Focuses on biological response mechanisms to cosmic radiation in space.",
+            "This paper analyzes how cosmic rays interact with the Earth’s atmosphere, influencing weather patterns and climate variability.
+             It compares different models to understand the impact of cosmic ray flux on atmospheric ionization and cloud formation.",
+            
+            "This paper explores biological pathways and protective measures against harmful cosmic radiation exposure.
+             It reviews cellular responses, genetic impacts, and adaptive mechanisms found in various organisms.
+             The study emphasizes the importance of biological shielding for deep-space missions and human health.",
+            
             "Examines biological impacts of cosmic ray exposure.",
-            "Discusses microprocessor tech and how cosmic rays cause single event upsets.",
-            "Analyzes the impact of cosmic rays on satellite communications systems."
+            
+            "The study investigates how microprocessor circuits are vulnerable to single event upsets (SEUs) caused by cosmic rays.
+             It presents test results and real-case observations from satellite missions.
+             Recommendations for radiation-hardening techniques and fault-tolerant designs are provided.",
+             
+            "This paper discusses the adverse effects of cosmic rays on satellite communication systems.
+             It explains how high-energy particles can induce bit errors and signal loss in satellite electronics.
+             Mitigation strategies and design considerations are also highlighted to enhance system reliability."
         ]
     })
 
