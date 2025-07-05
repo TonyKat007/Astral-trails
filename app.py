@@ -583,7 +583,7 @@ with tabs[7]:
 
     st.dataframe(filtered)
 
-    st.markdown("### 📑 Paper Summaries")
+    st.markdown("### Paper Summaries")
     for _, row in filtered.iterrows():
         st.write(f"**{row['Title']}**")
         st.write(f"*Authors:* {row['Authors']}")
