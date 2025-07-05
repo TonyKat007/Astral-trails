@@ -540,7 +540,7 @@ with tabs[7]:
 
     papers = pd.DataFrame({
         "Title": [
-            "Comparative study of effects of cosmic rays on the earth’s atmospheric processes ",
+            "Comparative study of effects of cosmic rays on the earth’s atmospheric processes",
             "Beyond Earthly Limits: Protection against Cosmic Radiation through Biological Response Pathways",
             "The effect of cosmic rays on biological systems",
             "Microprocessor technology and single event upset susceptibility",
