@@ -437,17 +437,51 @@ with tabs[5]:
 This tool helps in comparing the risk factor across different mission environments.
     """)
 # Tab 7: Space Weather
-# Tab 7: Space Weather Live
 with tabs[6]:
     import requests
     import datetime
     import matplotlib.pyplot as plt
+    import pandas as pd
     import folium
     from streamlit_folium import folium_static
 
     st.subheader("🌞 Real-Time Space Weather Monitor")
 
-    # --- Proton Flux (≥10 MeV) ---
+    # --- Solar Flare Map (Mocked Locations) ---
+    st.markdown("### ☀️ Solar Flare Activity Map")
+    st.info("Note: Solar flare positions shown are mock data for visualization purposes only. Real solar flare coordinates are not provided in GOES public feeds.")
+
+    # Create map centered around equator (Sun-facing view concept)
+    flare_map = folium.Map(location=[0, 0], zoom_start=2, tiles="CartoDB positron")
+
+    # Simulated flare data
+    mock_flares = [
+        {"lat": 10.5, "lon": 75.3, "class": "M"},
+        {"lat": -8.2, "lon": -60.1, "class": "C"},
+        {"lat": 23.7, "lon": 140.9, "class": "X"},
+        {"lat": -15.1, "lon": 30.4, "class": "C"},
+        {"lat": 5.4, "lon": -120.3, "class": "M"}
+    ]
+
+    flare_colors = {
+        "C": "green",
+        "M": "orange",
+        "X": "red"
+    }
+
+    for flare in mock_flares:
+        folium.CircleMarker(
+            location=[flare["lat"], flare["lon"]],
+            radius=7,
+            popup=f"Class {flare['class']} Flare",
+            color=flare_colors[flare["class"]],
+            fill=True,
+            fill_opacity=0.8
+        ).add_to(flare_map)
+
+    folium_static(flare_map)
+
+    # --- Proton Flux ---
     st.markdown("### ☢️ Proton Flux (≥10 MeV)")
     try:
         url_proton = "https://services.swpc.noaa.gov/json/goes/primary/integral-protons-3-day.json"
@@ -470,7 +504,7 @@ with tabs[6]:
     except:
         st.error("Could not load proton flux data.")
 
-    # --- X-Ray Flux (Solar Flares) ---
+    # --- X-Ray Flux ---
     st.markdown("### ⚡ X-Ray Flux (Solar Flares)")
     try:
         url_xray = "https://services.swpc.noaa.gov/json/goes/primary/xrays-3-day.json"
@@ -484,6 +518,44 @@ with tabs[6]:
         ax.set_ylabel("Flux (W/m²)")
         ax.set_xlabel("UTC Time")
         ax.set_yscale("log")
+        ax.grid(True)
+        st.pyplot(fig)
+
+        if short[-1] > 1e-5:
+            st.warning("⚠️ Possible solar flare detected!")
+        else:
+            st.success("✅ No flare activity at the moment.")
+    except:
+        st.error("Could not load X-ray data.")
+
+    # --- Kp Index ---
+    st.markdown("### 🧭 Kp Index (Geomagnetic Storms)")
+    try:
+        url_kp = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json"
+        raw_data = requests.get(url_kp).json()
+
+        header = raw_data[0]
+        rows = raw_data[1:]
+
+        df_kp = pd.DataFrame(rows, columns=header)
+        df_kp["time_tag"] = pd.to_datetime(df_kp["time_tag"])
+        df_kp["Kp"] = pd.to_numeric(df_kp["Kp"], errors='coerce')
+
+        fig, ax = plt.subplots()
+        ax.plot(df_kp["time_tag"], df_kp["Kp"], color='blue')
+        ax.set_title("NOAA Kp Index (Last 3 Days)")
+        ax.set_ylabel("Kp Value")
+        ax.set_xlabel("UTC Time")
+        ax.grid(True)
+        st.pyplot(fig)
+
+        latest_kp = df_kp["Kp"].iloc[-1]
+        if latest_kp >= 5:
+            st.warning(f"🌐 Geomagnetic storm conditions likely (Kp = {latest_kp})")
+        else:
+            st.success(f"✅ Geomagnetic field is quiet (Kp = {latest_kp})")
+    except Exception as e:
+        st.error(f"Could not load Kp index data: {e}")
 
 # Tab 8: Research Library
 with tabs[7]:
