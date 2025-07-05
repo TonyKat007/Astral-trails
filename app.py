@@ -1,16 +1,12 @@
 import streamlit as st
-import datetime
+from datetime import datetime
 import requests
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import folium
 import random
-from streamlit_folium import st_folium
-import os
-from pathlib import Path
-import plotly.graph_objects as go
-
+from streamlit_folium import folium_static
 
 # App configuration
 st.set_page_config(
@@ -19,15 +15,21 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Caching API requests to avoid continuous refresh
+@st.cache_data(ttl=300)
+def fetch_json(url):
+    try:
+        return requests.get(url).json()
+    except:
+        return None
+
 # Title
 st.title("Cosmic Radiation Research Dashboard")
 
 # Intro section on homepage
 st.markdown("""
 Welcome to the **Cosmic Radiation Research Dashboard** — an interactive platform to explore real-time and simulated data on cosmic rays, their biological and technological effects, and mission safety.
-
 ---
-
 **Select a feature tab below to begin your research:**
 """)
 
@@ -44,47 +46,31 @@ tabs = st.tabs([
     "Upload & Analyze Your Data"
 ])
 
-# ========== TAB 1: Radiation Risk Calculator ==========
+# === TAB 1: Radiation Risk Calculator ===
 with tabs[0]:
     st.subheader("Radiation Risk Calculator")
-    st.info("This tool estimates the radiation dose and cancer risk for a space mission based on real-time solar particle flux and selected shielding.")
     mission_days = st.slider("Mission Duration (days)", 1, 1000, 180)
-    shielding_material = st.selectbox(
-    "Shielding Material", 
-    ["None", "Aluminum", "Polyethylene", "Lead", "Water", "Titanium", "Carbon Fiber", "Hydrogen-rich Plastic"]
-)
+    shielding_material = st.selectbox("Shielding Material", ["None", "Aluminum", "Polyethylene"])
 
-
-    url = "https://services.swpc.noaa.gov/json/goes/primary/integral-protons-3-day.json"
-    try:
-        data = requests.get(url).json()
+    data = fetch_json("https://services.swpc.noaa.gov/json/goes/primary/integral-protons-3-day.json")
+    if data:
         df = pd.DataFrame(data)
         df['time_tag'] = pd.to_datetime(df['time_tag'])
         df['flux'] = pd.to_numeric(df['flux'], errors='coerce')
-        flux=df['flux'].iloc[-1]
+        flux = df['flux'].iloc[-1]
         st.success(f"Live Proton Flux (≥10 MeV): {flux:.2e} protons/cm²/s/sr")
-    except:
+    else:
         flux = 100
         st.warning("Unable to fetch live data. Using default flux: 100 p/cm²/s/sr")
 
     base_dose_per_day = flux * 0.00005
-    shield_factors = {
-    'None': 1.0,
-    'Aluminum': 0.7,
-    'Polyethylene': 0.5,
-    'Lead': 0.3,
-    'Water': 0.6,
-    'Titanium': 0.75,
-    'Carbon Fiber': 0.65,
-    'Hydrogen-rich Plastic': 0.4
-}
+    shield_factors = {'None': 1.0, 'Aluminum': 0.7, 'Polyethylene': 0.5}
     daily_dose = base_dose_per_day * shield_factors[shielding_material]
     total_dose = daily_dose * mission_days
     risk_percent = (total_dose / 1000) * 5
 
     st.metric("☢️ Estimated Total Dose (mSv)", f"{total_dose:.2f}")
     st.metric("⚠️ Estimated Cancer Risk", f"{risk_percent:.2f} %")
-    st.caption("ICRP model: 5% risk increase per 1 Sv of exposure. Not for clinical use.")
 
     st.subheader("Dose Accumulation Over Time")
     days = np.arange(1, mission_days + 1)
@@ -105,30 +91,18 @@ with tabs[0]:
     ax2.set_ylabel("Number of Astronauts")
     st.pyplot(fig2)
 
-    st.subheader("Shielding Material Effectiveness")
-    df = pd.DataFrame({
-    "Material": [
-        "None", "Aluminum", "Polyethylene", "Lead", "Water", 
-        "Titanium", "Carbon Fiber", "Hydrogen-rich Plastic"
-    ],
-    "Approx. Dose Reduction (%)": [0, 30, 50, 70, 40, 25, 35, 60]
-})
-    st.dataframe(df)
-
-# ========== TAB 2: Live Cosmic Ray Shower Map ==========
+# TAB 2: Live Cosmic Ray Shower Map (mock)
 with tabs[1]:
     st.subheader("Live Cosmic Ray Shower Map")
-    st.info("Map currently shows **mock shower data**. Live data from observatories coming soon!")
     m = folium.Map(location=[20, 0], zoom_start=2, tiles="https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png",
-                   attr="Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.")
+                   attr="Map tiles by Stamen Design")
     for _ in range(25):
         lat, lon = random.uniform(-60, 60), random.uniform(-180, 180)
         intensity = random.choice(['Low', 'Moderate', 'High'])
         color = {'Low': 'green', 'Moderate': 'orange', 'High': 'red'}[intensity]
-        folium.CircleMarker(location=[lat, lon], radius=6, popup=f"Shower\nIntensity: {intensity}", color=color,
+        folium.CircleMarker(location=[lat, lon], radius=6, popup=f"Shower: {intensity}", color=color,
                             fill=True, fill_opacity=0.7).add_to(m)
-    st_folium(m, width=700)
-    st.caption("Simulated data. Future version will include real-time showers from cosmic ray arrays.")
+    folium_static(m)
 
 # Tab 3: Biological Effects
 with tabs[2]:
@@ -398,21 +372,25 @@ with tabs[4]:
 with tabs[5]:
     import matplotlib.pyplot as plt
     import numpy as np
-    import pandas as pd
 
     st.subheader("🛰️ Space Mission Radiation Dose Comparator")
 
     # Predefined missions
     missions = ["ISS (LEO)", "Lunar Orbit", "Lunar Surface", "Mars Transit", "Deep Space"]
     daily_doses = [0.3, 0.5, 1.0, 1.8, 2.5]  # mSv/day (based on NASA data ranges)
+    durations = {
+        "Short (30 days)": 30,
+        "Medium (180 days)": 180,
+        "Long (900 days)": 900
+    }
 
-    # 🔄 Replacing dropdown with a slider for custom duration
-    days = st.slider("🕒 Select Mission Duration (days)", min_value=1, max_value=1000, value=180, step=1)
+    duration_choice = st.selectbox("🕒 Mission Duration", list(durations.keys()))
+    days = durations[duration_choice]
 
-    # Compute total doses
     total_doses = [dose * days for dose in daily_doses]
 
     # Display table
+    import pandas as pd
     df = pd.DataFrame({
         "Mission": missions,
         "Daily Dose (mSv)": daily_doses,
@@ -422,6 +400,7 @@ with tabs[5]:
 
     # Plot
     st.subheader("📊 Total Radiation Dose per Mission")
+
     fig, ax = plt.subplots()
     bars = ax.bar(missions, total_doses, color="mediumslateblue")
     ax.set_ylabel("Total Dose (mSv)")
@@ -439,7 +418,6 @@ with tabs[5]:
 
 This tool helps in comparing the risk factor across different mission environments.
     """)
-
 # Tab 7: Space Weather
 with tabs[6]:
     import requests
@@ -498,39 +476,39 @@ with tabs[6]:
     # --- Kp Index (Geomagnetic Storms) ---
     st.markdown("### 🧭 Kp Index (Geomagnetic Storms)")
     
-     # --- Kp Index Plot---
-import streamlit as st
-import pandas as pd
-
-st.subheader("🧭 Geomagnetic Kp Index (From Local JSON File)")
-
-# ✅ Use escaped path or raw string
-kp_file_path = r"C:\Users\zeba\Downloads\planetary_k_index_1m.json"
-
 try:
-    # Load JSON file
-    kp_data = pd.read_json(kp_file_path)
+    url_kp = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json"
+    raw_data = requests.get(url_kp).json()
 
-    # If it's a list of dicts (like NOAA format), convert to DataFrame
-    if isinstance(kp_data.iloc[0], dict):
-        kp_df = pd.DataFrame(kp_data.tolist())
-    else:
-        kp_df = kp_data
+    # First row is header
+    header = raw_data[0]
+    rows = raw_data[1:]
 
-    # Ensure correct column names (adjust if different)
-    kp_df['time_tag'] = pd.to_datetime(kp_df['time_tag'], errors='coerce')
-    kp_df['Kp'] = pd.to_numeric(kp_df['Kp'], errors='coerce')
+    # Convert to DataFrame
+    df_kp = pd.DataFrame(rows, columns=header)
 
-    kp_df = kp_df.dropna(subset=['time_tag', 'Kp'])
-    kp_df = kp_df.sort_values('time_tag')
+    # Convert datetime and Kp to usable types
+    df_kp["time_tag"] = pd.to_datetime(df_kp["time_tag"])
+    df_kp["Kp"] = pd.to_numeric(df_kp["Kp"], errors='coerce')
 
     # Plot
-    st.line_chart(kp_df.rename(columns={'time_tag': 'index'}).set_index('index')[['Kp']])
+    fig, ax = plt.subplots()
+    ax.plot(df_kp["time_tag"], df_kp["Kp"], color='blue')
+    ax.set_title("NOAA Kp Index (Last 3 Days)")
+    ax.set_ylabel("Kp Value")
+    ax.set_xlabel("UTC Time")
+    ax.grid(True)
+    st.pyplot(fig)
 
-except FileNotFoundError:
-    st.error(f"File not found: `{kp_file_path}`. Please check the path.")
+    # Last Kp reading warning
+    latest_kp = df_kp["Kp"].iloc[-1]
+    if latest_kp >= 5:
+        st.warning(f"🌐 Geomagnetic storm conditions likely (Kp = {latest_kp})")
+    else:
+        st.success(f"✅ Geomagnetic field is quiet (Kp = {latest_kp})")
+
 except Exception as e:
-    st.warning(f"Error loading Kp index data: {e}")
+    st.error(f"Could not load Kp index data: {e}")
 
 # Tab 8: Research Library
 with tabs[7]:
@@ -615,11 +593,11 @@ with tabs[8]:
             except Exception as e:
                 st.error(f"Error reading file: {e}")
 
-# ========== FOOTER ==========
+
+# FOOTER
 st.markdown(f"""
 ---
 <p style='text-align: center; color: gray'>
-Built by Tanmay Rajput | Last updated: {datetime.datetime.now().strftime('%B %d, %Y')}
+Built by Tanmay Rajput | Last updated: {datetime.today().strftime('%B %d, %Y')}
 </p>
 """, unsafe_allow_html=True)
-
