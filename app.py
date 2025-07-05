@@ -536,7 +536,6 @@ with tabs[7]:
     Browse handpicked research papers on cosmic rays, radiation health, and space missions.
     """)
 
-    # Example static paper list
     import pandas as pd
 
     papers = pd.DataFrame({
@@ -562,7 +561,14 @@ with tabs[7]:
             "https://www.iosrjournals.org/iosr-jece/papers/Vol.%2019%20Issue%202/Ser-1/D1902013337.pdf"
         ],
         "Year": [2020, 2024, 2012, 1996, 2024],
-        "Tags": ["Atmosphere", "Biology", "Biology", "Electronics", "Electronics"]
+        "Tags": ["Atmosphere", "Biology", "Biology", "Electronics", "Electronics"],
+        "Summary": [
+            "This paper compares how cosmic rays affect the Earth's weather and atmospheric conditions.",
+            "Focuses on biological response mechanisms to cosmic radiation in space.",
+            "Examines biological impacts of cosmic ray exposure.",
+            "Discusses microprocessor tech and how cosmic rays cause single event upsets.",
+            "Analyzes the impact of cosmic rays on satellite communications systems."
+        ]
     })
 
     tag = st.selectbox("Filter by Tag", ["All", "Atmosphere", "Biology", "Electronics"])
@@ -573,7 +579,15 @@ with tabs[7]:
 
     st.dataframe(filtered)
 
-    # Add download example
+    st.markdown("### 📑 Paper Summaries")
+    for _, row in filtered.iterrows():
+        st.write(f"**{row['Title']}**")
+        st.write(f"*Authors:* {row['Authors']}")
+        st.write(f"*Year:* {row['Year']}")
+        st.write(f"*Summary:* {row['Summary']}")
+        st.write(f"[Read Paper]({row['Link']})")
+        st.write("---")
+
     st.markdown("### 📎 Example Paper Download")
     st.download_button(
         "Download Example Paper (PDF)",
@@ -581,6 +595,7 @@ with tabs[7]:
         file_name="example_paper.pdf",
         mime="application/pdf"
     )
+
 # Tab 9: cosmic ray data explorerwith tabs[8]:
 with tabs[8]:
     st.subheader("📤 Upload & Analyze Your Own Cosmic Ray Dataset")
