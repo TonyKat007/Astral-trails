@@ -563,8 +563,7 @@ with tabs[7]:
         "Year": [2020, 2024, 2012, 1996, 2024],
         "Tags": ["Atmosphere", "Biology", "Biology", "Electronics", "Electronics"],
         "Summary": [
-            "This paper analyzes how cosmic rays interact with the Earth’s atmosphere, influencing weather patterns and climate variability.
-             It compares different models to understand the impact of cosmic ray flux on atmospheric ionization and cloud formation.",
+            "This paper analyzes how cosmic rays interact with the Earth’s atmosphere, influencing weather patterns and climate variability. It compares different models to understand the impact of cosmic ray flux on atmospheric ionization and cloud formation.",
             
             "This paper explores biological pathways and protective measures against harmful cosmic radiation exposure.
              It reviews cellular responses, genetic impacts, and adaptive mechanisms found in various organisms.
