@@ -343,12 +343,12 @@ with tabs[4]:
     import numpy as np
     import matplotlib.pyplot as plt
 
-    st.subheader("📈 Cosmic Ray Data Explorer")
+    st.subheader("Cosmic Ray Data Explorer")
     st.markdown("Explore how different particles behave over energy ranges using mock spectra.")
 
     # Dropdowns for user input
-    source = st.selectbox("🔬 Select Data Source", ["AMS-02", "Voyager 1", "Mock Data"])
-    particle = st.selectbox("🧪 Select Particle Type", ["Protons", "Helium Nuclei", "Iron Nuclei"])
+    source = st.selectbox("Select Data Source", ["AMS-02", "Voyager 1", "Mock Data"])
+    particle = st.selectbox("Select Particle Type", ["Protons", "Helium Nuclei", "Iron Nuclei"])
 
     # Generate sample spectra (mock data)
     energy = np.logspace(0.1, 3, 50)  # MeV range
@@ -376,12 +376,12 @@ with tabs[4]:
 
     # Description
     st.markdown("""
-    📡 **Cosmic Ray Spectra** represent the distribution of particle flux over different energies.
+    **Cosmic Ray Spectra** represent the distribution of particle flux over different energies.
 
     These spectra vary based on:
-    - ☀️ Source (e.g., solar, galactic, extragalactic)
-    - 🧬 Particle type (proton, helium, iron, etc.)
-    - 🌍 Location (Earth orbit, interstellar space, etc.)
+    - Source (e.g., solar, galactic, extragalactic)
+    - Particle type (proton, helium, iron, etc.)
+    - Location (Earth orbit, interstellar space, etc.)
 
     Real data from **AMS-02**, **Voyager**, and **CRDB** can be integrated in future releases.
     """)
