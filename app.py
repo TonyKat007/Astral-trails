@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import folium
 import random
 from streamlit_folium import folium_static
+import plotly as go
 
 # App configuration
 st.set_page_config(
