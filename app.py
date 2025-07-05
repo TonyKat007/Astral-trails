@@ -70,8 +70,8 @@ with tabs[0]:
     total_dose = daily_dose * mission_days
     risk_percent = (total_dose / 1000) * 5
 
-    st.metric("☢️ Estimated Total Dose (mSv)", f"{total_dose:.2f}")
-    st.metric("⚠️ Estimated Cancer Risk", f"{risk_percent:.2f} %")
+    st.metric("☢️ Estimated Total Dose (mSv)", f"{total_dose:.5f}")
+    st.metric("⚠️ Estimated Cancer Risk", f"{risk_percent:.5f} %")
 
     st.subheader("Dose Accumulation Over Time")
     days = np.arange(1, mission_days + 1)
