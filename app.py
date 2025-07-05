@@ -257,7 +257,7 @@ with tabs[3]:
     st.subheader("Effects of Cosmic Radiation on Electronics")
 
     # Inputs
-    duration = st.slider("Mission Duration (days)", 1, 1000, 180)
+    duration = st.slider("Mission Duration (in days)", 1, 1000, 180)
     shielding = st.selectbox("Shielding Level", ["None", "Light", "Heavy"])
     sensitivity = st.selectbox("Electronics Sensitivity", ["Standard", "Hardened", "Critical"])
 
