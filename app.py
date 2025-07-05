@@ -49,7 +49,11 @@ with tabs[0]:
     st.subheader("Radiation Risk Calculator")
     st.info("This tool estimates the radiation dose and cancer risk for a space mission based on real-time solar particle flux and selected shielding.")
     mission_days = st.slider("Mission Duration (days)", 1, 1000, 180)
-    shielding_material = st.selectbox("Shielding Material", ["None", "Aluminum", "Polyethylene"])
+    shielding_material = st.selectbox(
+    "Shielding Material", 
+    ["None", "Aluminum", "Polyethylene", "Lead", "Water", "Titanium", "Carbon Fiber", "Hydrogen-rich Plastic"]
+)
+
 
     url = "https://services.swpc.noaa.gov/json/goes/primary/integral-protons-3-day.json"
     try:
@@ -64,7 +68,16 @@ with tabs[0]:
         st.warning("Unable to fetch live data. Using default flux: 100 p/cm²/s/sr")
 
     base_dose_per_day = flux * 0.00005
-    shield_factors = {'None': 1.0, 'Aluminum': 0.7, 'Polyethylene': 0.5}
+    shield_factors = {
+    'None': 1.0,
+    'Aluminum': 0.7,
+    'Polyethylene': 0.5,
+    'Lead': 0.3,
+    'Water': 0.6,
+    'Titanium': 0.75,
+    'Carbon Fiber': 0.65,
+    'Hydrogen-rich Plastic': 0.4
+}
     daily_dose = base_dose_per_day * shield_factors[shielding_material]
     total_dose = daily_dose * mission_days
     risk_percent = (total_dose / 1000) * 5
@@ -93,7 +106,13 @@ with tabs[0]:
     st.pyplot(fig2)
 
     st.subheader("Shielding Material Effectiveness")
-    df = pd.DataFrame({"Material": ["None", "Aluminum", "Polyethylene"], "Approx. Dose Reduction (%)": [0, 30, 50]})
+    df = pd.DataFrame({
+    "Material": [
+        "None", "Aluminum", "Polyethylene", "Lead", "Water", 
+        "Titanium", "Carbon Fiber", "Hydrogen-rich Plastic"
+    ],
+    "Approx. Dose Reduction (%)": [0, 30, 50, 70, 40, 25, 35, 60]
+})
     st.dataframe(df)
 
 # ========== TAB 2: Live Cosmic Ray Shower Map ==========
