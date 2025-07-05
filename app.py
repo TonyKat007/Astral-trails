@@ -451,10 +451,7 @@ with tabs[6]:
     st.markdown("### ☀️ Solar Flare Activity Map")
     st.info("Note: Solar flare positions shown are mock data for visualization purposes only. Real solar flare coordinates are not provided in GOES public feeds.")
 
-    # Create map centered around equator (Sun-facing view concept)
     flare_map = folium.Map(location=[0, 0], zoom_start=2, tiles="CartoDB positron")
-
-    # Simulated flare data
     mock_flares = [
         {"lat": 10.5, "lon": 75.3, "class": "M"},
         {"lat": -8.2, "lon": -60.1, "class": "C"},
@@ -462,12 +459,7 @@ with tabs[6]:
         {"lat": -15.1, "lon": 30.4, "class": "C"},
         {"lat": 5.4, "lon": -120.3, "class": "M"}
     ]
-
-    flare_colors = {
-        "C": "green",
-        "M": "orange",
-        "X": "red"
-    }
+    flare_colors = {"C": "green", "M": "orange", "X": "red"}
 
     for flare in mock_flares:
         folium.CircleMarker(
@@ -533,7 +525,6 @@ with tabs[6]:
     try:
         url_kp = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json"
         raw_data = requests.get(url_kp).json()
-
         header = raw_data[0]
         rows = raw_data[1:]
 
