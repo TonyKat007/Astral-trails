@@ -254,12 +254,12 @@ with tabs[2]:
     
 # Tab 4: Effects on Electronics
 with tabs[3]:
-    st.subheader("💻 Effects of Cosmic Radiation on Electronics")
+    st.subheader("Effects of Cosmic Radiation on Electronics")
 
     # Inputs
-    duration = st.slider("🕒 Mission Duration (days)", 1, 1000, 180)
-    shielding = st.selectbox("🛡️ Shielding Level", ["None", "Light", "Heavy"])
-    sensitivity = st.selectbox("📦 Electronics Sensitivity", ["Standard", "Hardened", "Critical"])
+    duration = st.slider("Mission Duration (days)", 1, 1000, 180)
+    shielding = st.selectbox("Shielding Level", ["None", "Light", "Heavy"])
+    sensitivity = st.selectbox("Electronics Sensitivity", ["Standard", "Hardened", "Critical"])
 
     # Sensitivity factors
     sensitivity_factor = {
@@ -293,13 +293,13 @@ with tabs[3]:
         risk = "High"
         color = "red"
 
-    st.metric("📉 Estimated SEUs", f"{total_seus:.2f}")
-    st.success(f"⚠️ Failure Risk Level: {risk}")
+    st.metric("Estimated SEUs", f"{total_seus:.2f}")
+    st.success(f"Failure Risk Level: {risk}")
 
     # Visualization: Shielding vs SEU Rate
     import matplotlib.pyplot as plt
 
-    st.subheader("📊 SEU Rate vs Shielding")
+    st.subheader("SEU Rate vs Shielding")
 
     levels = ["None", "Light", "Heavy"]
     rates = [base_seu_rate * sensitivity_factor[sensitivity] * shielding_factor[lev] * duration for lev in levels]
