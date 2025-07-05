@@ -565,19 +565,13 @@ with tabs[7]:
         "Summary": [
             "This paper analyzes how cosmic rays interact with the Earth’s atmosphere, influencing weather patterns and climate variability. It compares different models to understand the impact of cosmic ray flux on atmospheric ionization and cloud formation.",
             
-            "This paper explores biological pathways and protective measures against harmful cosmic radiation exposure.
-             It reviews cellular responses, genetic impacts, and adaptive mechanisms found in various organisms.
-             The study emphasizes the importance of biological shielding for deep-space missions and human health.",
+            "This paper explores biological pathways and protective measures against harmful cosmic radiation exposure. It reviews cellular responses, genetic impacts, and adaptive mechanisms found in various organisms. The study emphasizes the importance of biological shielding for deep-space missions and human health.",
             
             "Examines biological impacts of cosmic ray exposure.",
             
-            "The study investigates how microprocessor circuits are vulnerable to single event upsets (SEUs) caused by cosmic rays.
-             It presents test results and real-case observations from satellite missions.
-             Recommendations for radiation-hardening techniques and fault-tolerant designs are provided.",
+            "The study investigates how microprocessor circuits are vulnerable to single event upsets (SEUs) caused by cosmic rays. It presents test results and real-case observations from satellite missions. Recommendations for radiation-hardening techniques and fault-tolerant designs are provided.",
              
-            "This paper discusses the adverse effects of cosmic rays on satellite communication systems.
-             It explains how high-energy particles can induce bit errors and signal loss in satellite electronics.
-             Mitigation strategies and design considerations are also highlighted to enhance system reliability."
+            "This paper discusses the adverse effects of cosmic rays on satellite communication systems. It explains how high-energy particles can induce bit errors and signal loss in satellite electronics. Mitigation strategies and design considerations are also highlighted to enhance system reliability."
         ]
     })
 
