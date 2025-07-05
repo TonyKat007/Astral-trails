@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import folium
 import random
 from streamlit_folium import folium_static
-import plotly as go
+import plotly.graph_objects as go
 
 # App configuration
 st.set_page_config(
@@ -183,18 +183,14 @@ with tabs[2]:
         st.caption("Disclaimer: Conceptual illustration only.")
     except Exception as e:
         st.error(f"Could not load image: {e}\nCheck that 'images' folder exists alongside this script and contains {img_file}.")
-
-    # Interactive Risk chart
-    st.subheader("📊 Interactive Risk Severity Chart")
-
-    # Define thresholds and labels
+    
+        st.subheader("📊 Interactive Risk Severity Chart")
+    
     thresholds = [0, 1, 5, 15, 30, 50]
     labels = ["None", "Minor", "Mild ARS", "Severe ARS", "Lethal", "Extreme/Fatal"]
     colors = ["#2ecc71", "#f1c40f", "#f39c12", "#e67e22", "#e74c3c"]
-
-    # Create Plotly figure
+    
     fig = go.Figure()
-    # Background zones
     for i in range(len(thresholds) - 1):
         fig.add_shape(
             type="rect",
@@ -202,11 +198,10 @@ with tabs[2]:
             fillcolor=colors[i], opacity=0.3, layer="below", line_width=0
         )
         fig.add_annotation(
-            x=(thresholds[i]+thresholds[i+1]) / 2, y=0.95,
+            x=(thresholds[i]+thresholds[i+1])/2, y=0.95,
             text=labels[i], showarrow=False, font=dict(size=12), opacity=0.8
         )
-
-    # Plot markers: raw dose and adjusted dose
+    
     fig.add_trace(go.Scatter(
         x=[raw_dose], y=[0.5], mode='markers+text', name='Raw Dose',
         marker=dict(size=12), text=['Raw'], textposition='bottom center'
@@ -215,13 +210,14 @@ with tabs[2]:
         x=[adjusted_dose], y=[0.5], mode='markers+text', name='Adjusted Dose',
         marker=dict(size=12), text=['Adjusted'], textposition='top center'
     ))
-
+    
     fig.update_layout(
         xaxis=dict(title="Dose (mSv)", range=[0, thresholds[-1]]),
-        yaxis=dict(visible=False), title="Radiation Dose vs. Biological Risk",
+        yaxis=dict(visible=False),
+        title="Radiation Dose vs. Biological Risk",
         height=300, margin=dict(t=40, b=40), showlegend=True
     )
-
+    
     st.plotly_chart(fig, use_container_width=True)
 
     # Table: Organ-specific susceptibility
