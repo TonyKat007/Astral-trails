@@ -661,12 +661,15 @@ with tabs[6]:
     # 🌠 Cosmic Ray Storm Tracker
     # ========================
 st.markdown("### 🌠 Cosmic Ray Storm Tracker (Simulated Map)")
-from streamlit_folium import folium_static
+
 import folium
+from streamlit_folium import folium_static
+import random
 
-# Use a distinct variable for this map to avoid overwriting earlier ones
-cosmic_map = folium.Map(location=[10, 0], zoom_start=2, tiles="Stamen Terrain")
+# Create an independent map inside Tab 7
+space_weather_map = folium.Map(location=[0, 0], zoom_start=2, tiles="Stamen Terrain")
 
+# Add some simulated storm points
 for _ in range(20):
     lat, lon = random.uniform(-60, 60), random.uniform(-180, 180)
     intensity = random.choice(["Low", "Moderate", "High"])
@@ -679,9 +682,10 @@ for _ in range(20):
         color=color,
         fill=True,
         fill_opacity=0.6
-    ).add_to(cosmic_map)
+    ).add_to(space_weather_map)
 
-folium_static(cosmic_map)
+# Render map
+folium_static(space_weather_map)
 
 # Tab 8: Research Library
 with tabs[7]:
