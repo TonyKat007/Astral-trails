@@ -811,6 +811,6 @@ with tabs[8]:
 st.markdown(f"""
 ---
 <p style='text-align: center; color: gray'>
-Built by Astral Champions | Last updated: {datetime.datetime.now().strftime('%B %d, %Y')}
+Built by the Impostor Among Us | Last updated: {datetime.datetime.now().strftime('%B %d, %Y')}
 </p>
 """, unsafe_allow_html=True)
