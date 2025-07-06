@@ -254,35 +254,40 @@ with tabs[2]:
     
 # Tab 4: Effects on Electronics
 with tabs[3]:
-    st.subheader("Effects of Cosmic Radiation on Electronics")
+    st.subheader("💻 Effects of Cosmic Radiation on Electronics")
 
-    # Inputs
-    duration = st.slider("Mission Duration (in days)", 1, 1000, 180)
-    shielding = st.selectbox("Shielding Level", ["None", "Light", "Heavy"])
-    sensitivity = st.selectbox("Electronics Sensitivity", ["Standard", "Hardened", "Critical"])
+    # --- Inputs ---
+    mission_profile = st.selectbox("🛰 Mission Environment", ["ISS (LEO)", "Lunar Orbit", "Mars Transit", "Deep Space"])
+    duration = st.slider("🕒 Mission Duration (days)", 1, 1000, 180)
+    shielding = st.selectbox("🛡️ Shielding Level", ["None", "Light", "Heavy"])
+    sensitivity = st.selectbox("📦 Electronics Sensitivity", ["Standard", "Hardened", "Critical"])
 
-    # Sensitivity factors
+    # --- Mission profile base SEU rate (mocked SPENVIS/ESA data in Ups/day) ---
+    mission_base_rates = {
+        "ISS (LEO)": 0.0005,
+        "Lunar Orbit": 0.002,
+        "Mars Transit": 0.004,
+        "Deep Space": 0.006
+    }
+    base_seu_rate = mission_base_rates[mission_profile]
+
+    # --- Sensitivity and Shielding Modifiers ---
     sensitivity_factor = {
         "Standard": 1.0,
         "Hardened": 0.5,
         "Critical": 2.0
     }
-
-    # Shielding effectiveness
     shielding_factor = {
         "None": 1.0,
         "Light": 0.6,
         "Heavy": 0.3
     }
 
-    # Base SEU rate per day (mock value)
-    base_seu_rate = 0.002  # Ups/day
-
-    # Calculate adjusted SEU rate
+    # --- Adjusted SEU Rate & Total SEUs ---
     adjusted_rate = base_seu_rate * sensitivity_factor[sensitivity] * shielding_factor[shielding]
     total_seus = adjusted_rate * duration
 
-    # Categorize risk
+    # --- Risk Categorization ---
     if total_seus < 1:
         risk = "Low"
         color = "green"
@@ -293,40 +298,25 @@ with tabs[3]:
         risk = "High"
         color = "red"
 
-    st.metric("Estimated SEUs", f"{total_seus:.2f}")
-    st.success(f"Failure Risk Level: {risk}")
+    st.metric("📉 Estimated SEUs", f"{total_seus:.2f}")
+    st.success(f"⚠️ Failure Risk Level: {risk}")
 
-    # Visualization: Shielding vs SEU Rate
-    import matplotlib.pyplot as plt
-
-    st.subheader("SEU Rate vs Shielding")
+    # --- SEU Rate vs Shielding ---
+    st.subheader("📊 SEU Rate vs Shielding")
 
     levels = ["None", "Light", "Heavy"]
     rates = [base_seu_rate * sensitivity_factor[sensitivity] * shielding_factor[lev] * duration for lev in levels]
 
-    fig, ax = plt.subplots()
-    ax.bar(levels, rates, color=['red', 'orange', 'green'])
-    ax.set_ylabel("Total SEUs (bit flips)")
-    ax.set_title("Effect of Shielding on SEU Risk")
-    st.pyplot(fig)
+    fig1, ax1 = plt.subplots()
+    ax1.bar(levels, rates, color=['red', 'orange', 'green'])
+    ax1.set_ylabel("Total SEUs (bit flips)")
+    ax1.set_title(f"Effect of Shielding on SEU Risk ({mission_profile})")
+    st.pyplot(fig1)
 
-    # Explanation
-    st.markdown("""
-    Cosmic rays, particularly high-energy protons and heavy ions, can disrupt electronics in space.  
-    These **Single Event Upsets (SEUs)** can cause:
-    - Memory bit flips
-    - Logic faults
-    - Temporary or permanent device failure
-
-    **Radiation hardening** and **shielding** are key to reducing these effects in space missions.
-    """)
-
-
-    #Monte Carlo simulation of 1000 devices and the effect on them
-    
+    # --- Monte Carlo Distribution ---
     st.subheader("🎲 Monte Carlo Simulation (1000 Devices)")
     simulated_failures = np.random.normal(loc=total_seus, scale=0.2 * total_seus, size=1000)
-    simulated_failures = np.clip(simulated_failures, 0, None)  # no negative SEUs
+    simulated_failures = np.clip(simulated_failures, 0, None)
 
     fig2, ax2 = plt.subplots()
     ax2.hist(simulated_failures, bins=30, color='purple', edgecolor='black')
@@ -335,7 +325,29 @@ with tabs[3]:
     ax2.set_ylabel("Number of Devices")
     st.pyplot(fig2)
 
-    st.caption("Simulates variation in SEU impact across 1000 similar devices.")
+    # --- Real-Time Failure Accumulation (Optional Plot) ---
+    st.subheader("📈 Estimated SEU Accumulation Over Time")
+    days = np.arange(1, duration + 1)
+    accumulated_seus = adjusted_rate * days
+
+    fig3, ax3 = plt.subplots()
+    ax3.plot(days, accumulated_seus, color='crimson')
+    ax3.set_xlabel("Days")
+    ax3.set_ylabel("Cumulative SEUs")
+    ax3.set_title("Projected Failure Growth Over Mission Duration")
+    st.pyplot(fig3)
+
+    # --- Description ---
+    st.markdown(f"""
+**Environment**: {mission_profile}  
+**Base SEU Rate**: {base_seu_rate:.4f} Ups/day (mocked NASA/ESA data)  
+**Sensitivity Mod**: ×{sensitivity_factor[sensitivity]}  
+**Shielding Mod**: ×{shielding_factor[shielding]}  
+
+Total expected SEUs are computed using environment- and hardware-specific radiation risk assumptions.  
+This model helps evaluate how electronics might behave in varied mission profiles.
+    """)
+
 
 
 # Tab 5: CR Data Explorer
