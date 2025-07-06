@@ -98,13 +98,15 @@ with tabs[0]:
     st.pyplot(fig)
 
    st.subheader("Monte Carlo Simulation (1000 Astronauts)")
-    simulated_doses = np.random.normal(loc=total_dose, scale=0.1 * total_dose, size=1000)
-    fig2, ax2 = plt.subplots()
-    ax2.hist(simulated_doses, bins=30, color='orange', edgecolor='black')
-    ax2.set_title("Simulated Dose Distribution")
-    ax2.set_xlabel("Total Dose (mSv)")
-    ax2.set_ylabel("Number of Astronauts")
-    st.pyplot(fig2)
+simulated_doses = np.random.normal(loc=total_dose, scale=0.1 * total_dose, size=1000)
+
+# Adjust figure size here
+fig2, ax2 = plt.subplots(figsize=(6, 3.5))  # Smaller size than default
+ax2.hist(simulated_doses, bins=30, color='orange', edgecolor='black')
+ax2.set_title("Simulated Dose Distribution")
+ax2.set_xlabel("Total Dose (mSv)")
+ax2.set_ylabel("Number of Astronauts")
+st.pyplot(fig2)
 
 # TAB 2: Live Cosmic Ray Shower Map (mock)
 with tabs[1]:
