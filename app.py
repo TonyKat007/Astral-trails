@@ -660,22 +660,29 @@ with tabs[6]:
     # ========================
     # 🌠 Cosmic Ray Storm Tracker
     # ========================
-    st.markdown("### 🌠 Cosmic Ray Storm Tracker (Mock Map)")
-    import folium
-    from streamlit_folium import folium_static
-    import random
+st.markdown("### 🌠 Cosmic Ray Storm Tracker (Simulated Map)")
+from streamlit_folium import folium_static
+import folium
 
-    m = folium.Map(location=[0, 0], zoom_start=2, tiles="CartoDB positron")
-    for _ in range(15):
-        lat, lon = random.uniform(-60, 60), random.uniform(-180, 180)
-        intensity = random.choice(['Low', 'Moderate', 'High'])
-        color = {'Low': 'green', 'Moderate': 'orange', 'High': 'red'}[intensity]
-        popup_text = f"Cosmic Ray Event<br>Intensity: {intensity}"
-        folium.CircleMarker(location=[lat, lon], radius=7, popup=popup_text, color=color,
-                            fill=True, fill_opacity=0.7).add_to(m)
+# Use a distinct variable for this map to avoid overwriting earlier ones
+cosmic_map = folium.Map(location=[10, 0], zoom_start=2, tiles="Stamen Terrain")
 
-    folium_static(m)
-    st.caption("Note: Data points are simulated to represent global cosmic ray storm activity.")
+for _ in range(20):
+    lat, lon = random.uniform(-60, 60), random.uniform(-180, 180)
+    intensity = random.choice(["Low", "Moderate", "High"])
+    color = {"Low": "green", "Moderate": "orange", "High": "red"}[intensity]
+
+    folium.CircleMarker(
+        location=[lat, lon],
+        radius=6,
+        popup=f"Event Intensity: {intensity}",
+        color=color,
+        fill=True,
+        fill_opacity=0.6
+    ).add_to(cosmic_map)
+
+folium_static(cosmic_map)
+
 # Tab 8: Research Library
 with tabs[7]:
     st.subheader("📚 Research Paper Library")
