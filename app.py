@@ -570,174 +570,119 @@ with tabs[5]:  # Mission Dose Comparator Tab
 
 # Tab 7: Space Weather
 with tabs[6]:
-    import requests
-    import datetime
-    import matplotlib.pyplot as plt
-    import pandas as pd
-    import folium
-    from streamlit_folium import folium_static
-
     st.subheader("🌞 Real-Time Space Weather Monitor")
 
-    # --- Solar Flare Map (Mocked Locations) ---
-    st.markdown("### ☀️ Solar Flare Activity Map")
-    st.info("Note: Solar flare positions shown are mock data for visualization purposes only. Real solar flare coordinates are not provided in GOES public feeds.")
+    # Sub-tabs for each feature
+    weather_tabs = st.tabs([
+        "☢ Proton Flux",
+        "⚡ X-Ray Flux",
+        "🧭 Kp Index",
+        "🌠 Cosmic Ray Storm Tracker"
+    ])
 
-    flare_map = folium.Map(location=[0, 0], zoom_start=2, tiles="CartoDB positron")
-    mock_flares = [
-        {"lat": 10.5, "lon": 75.3, "class": "M"},
-        {"lat": -8.2, "lon": -60.1, "class": "C"},
-        {"lat": 23.7, "lon": 140.9, "class": "X"},
-        {"lat": -15.1, "lon": 30.4, "class": "C"},
-        {"lat": 5.4, "lon": -120.3, "class": "M"}
-    ]
-    flare_colors = {"C": "green", "M": "orange", "X": "red"}
-
-    for flare in mock_flares:
-        folium.CircleMarker(
-            location=[flare["lat"], flare["lon"]],
-            radius=7,
-            popup=f"Class {flare['class']} Flare",
-            color=flare_colors[flare["class"]],
-            fill=True,
-            fill_opacity=0.8
-        ).add_to(flare_map)
-
-    folium_static(flare_map)
-
-     # --- Cosmic Ray Storm Tracker ---
-
-        st.subheader("🌠 Cosmic Ray Storm Tracker")
-
-        st.markdown("""
-        This tool monitors real-time surges in cosmic ray activity (space weather storms)
-        that can affect astronauts, satellites, and space missions.
-        """)
-
+    # ☢ Proton Flux
+    with weather_tabs[0]:
         try:
-            proton_data = requests.get("https://services.swpc.noaa.gov/json/goes/primary/integral-protons-3-day.json").json()
-            times = [datetime.strptime(d['time_tag'], "%Y-%m-%dT%H:%M:%SZ") for d in proton_data if d['energy'] == ">=10 MeV"]
-            fluxes = [float(d['flux']) for d in proton_data if d['energy'] == ">=10 MeV"]
+            url_proton = "https://services.swpc.noaa.gov/json/goes/primary/integral-protons-3-day.json"
+            proton_data = requests.get(url_proton).json()
+            times = [datetime.datetime.strptime(p["time_tag"], "%Y-%m-%dT%H:%M:%SZ") for p in proton_data if p["energy"] == ">=10 MeV"]
+            fluxes = [float(p["flux"]) for p in proton_data if p["energy"] == ">=10 MeV"]
 
             fig, ax = plt.subplots()
             ax.plot(times, fluxes, color='red')
-            ax.set_title("Proton Flux Activity (≥10 MeV)")
+            ax.set_title("Proton Flux (GOES - ≥10 MeV)")
             ax.set_ylabel("Flux (protons/cm²·s·sr)")
-            ax.set_xlabel("Time (UTC)")
+            ax.set_xlabel("UTC Time")
             ax.grid(True)
             st.pyplot(fig)
 
-            threshold = 100
-            storm_times = [t for t, f in zip(times, fluxes) if f > threshold]
-
-            if storm_times:
-                st.warning(f"🚨 Cosmic Ray Storm Detected! High flux at: {storm_times[-1]} UTC")
+            if fluxes[-1] > 100:
+                st.warning("⚠️ Elevated proton flux — possible solar event in progress.")
             else:
-                st.success("✅ No storm-level proton activity in the past 3 days.")
+                st.success("✅ Proton flux is at normal background levels.")
+        except:
+            st.error("Could not load proton flux data.")
 
+    # ⚡ X-Ray Flux
+    with weather_tabs[1]:
+        try:
+            url_xray = "https://services.swpc.noaa.gov/json/goes/primary/xrays-3-day.json"
+            xray_data = requests.get(url_xray).json()
+            x_times = [datetime.datetime.strptime(x["time_tag"], "%Y-%m-%dT%H:%M:%SZ") for x in xray_data]
+            short = [float(x["flux"]) for x in xray_data]
+
+            fig, ax = plt.subplots()
+            ax.plot(x_times, short, color='orange')
+            ax.set_title("X-Ray Short Flux (GOES)")
+            ax.set_ylabel("Flux (W/m²)")
+            ax.set_xlabel("UTC Time")
+            ax.set_yscale("log")
+            ax.grid(True)
+            st.pyplot(fig)
+
+            if short[-1] > 1e-5:
+                st.warning("⚠️ Possible solar flare detected!")
+            else:
+                st.success("✅ No flare activity at the moment.")
+        except:
+            st.error("Could not load X-ray data.")
+
+    # 🧭 Kp Index
+    with weather_tabs[2]:
+        try:
+            url_kp = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json"
+            raw_data = requests.get(url_kp).json()
+            header = raw_data[0]
+            rows = raw_data[1:]
+            df_kp = pd.DataFrame(rows, columns=header)
+            df_kp["time_tag"] = pd.to_datetime(df_kp["time_tag"])
+            df_kp["Kp"] = pd.to_numeric(df_kp["Kp"], errors='coerce')
+
+            fig, ax = plt.subplots()
+            ax.plot(df_kp["time_tag"], df_kp["Kp"], color='blue')
+            ax.set_title("NOAA Kp Index (Last 3 Days)")
+            ax.set_ylabel("Kp Value")
+            ax.set_xlabel("UTC Time")
+            ax.grid(True)
+            st.pyplot(fig)
+
+            latest_kp = df_kp["Kp"].iloc[-1]
+            if latest_kp >= 5:
+                st.warning(f"🌐 Geomagnetic storm conditions likely (Kp = {latest_kp})")
+            else:
+                st.success(f"✅ Geomagnetic field is quiet (Kp = {latest_kp})")
         except Exception as e:
-            st.error(f"Could not fetch or parse proton data: {e}")
+            st.error(f"Could not load Kp index data: {e}")
 
-        st.markdown("### 🌍 Global Radiation Risk Map (Simulated Zones)")
+    # 🌠 Cosmic Ray Storm Tracker
+    with weather_tabs[3]:
+        st.markdown("### 🌠 Cosmic Ray Storm Tracker (Mock Analysis)")
+        try:
+            # Reusing the same proton data
+            url = "https://services.swpc.noaa.gov/json/goes/primary/integral-protons-3-day.json"
+            response = requests.get(url)
+            proton_data = response.json()
 
-        map = folium.Map(location=[20, 0], zoom_start=2)
-        for _ in range(15):
-            lat, lon = random.uniform(-70, 70), random.uniform(-180, 180)
-            intensity = random.choice(['Normal', 'Elevated', 'Storm'])
-            color = {'Normal': 'green', 'Elevated': 'orange', 'Storm': 'red'}[intensity]
-            folium.CircleMarker(
-                location=[lat, lon],
-                radius=7,
-                color=color,
-                fill=True,
-                fill_opacity=0.7,
-                popup=f"Region: {intensity}"
-            ).add_to(map)
+            df = pd.DataFrame(proton_data)
+            df = df[df['energy'] == '>=10 MeV'].copy()
+            df['time_tag'] = pd.to_datetime(df['time_tag'])
+            df['flux'] = pd.to_numeric(df['flux'], errors='coerce')
+            df = df.sort_values(by='time_tag')
 
-        folium_static(map)
+            # Detect "storms" if sudden spike in flux (mock threshold)
+            df['flux_diff'] = df['flux'].diff()
+            spike_threshold = df['flux'].mean() * 2
+            df['storm'] = df['flux_diff'] > spike_threshold
 
-        st.markdown("### 🔍 Summary of Storm Events (Last 3 Days)")
+            st.line_chart(df.set_index('time_tag')['flux'])
 
-        if storm_times:
-            df_storms = pd.DataFrame({"Storm Time (UTC)": storm_times})
-            st.dataframe(df_storms)
-        else:
-            st.write("No storm events recorded recently.")
-
-    # --- Proton Flux ---
-    st.markdown("### ☢️ Proton Flux (≥10 MeV)")
-    try:
-        url_proton = "https://services.swpc.noaa.gov/json/goes/primary/integral-protons-3-day.json"
-        proton_data = requests.get(url_proton).json()
-        times = [datetime.datetime.strptime(p["time_tag"], "%Y-%m-%dT%H:%M:%SZ") for p in proton_data if p["energy"] == ">=10 MeV"]
-        fluxes = [float(p["flux"]) for p in proton_data if p["energy"] == ">=10 MeV"]
-
-        fig, ax = plt.subplots()
-        ax.plot(times, fluxes, color='red')
-        ax.set_title("Proton Flux (GOES - ≥10 MeV)")
-        ax.set_ylabel("Flux (protons/cm²·s·sr)")
-        ax.set_xlabel("UTC Time")
-        ax.grid(True)
-        st.pyplot(fig)
-
-        if fluxes[-1] > 100:
-            st.warning("⚠️ Elevated proton flux — possible solar event in progress.")
-        else:
-            st.success("✅ Proton flux is at normal background levels.")
-    except:
-        st.error("Could not load proton flux data.")
-
-    # --- X-Ray Flux ---
-    st.markdown("### ⚡ X-Ray Flux (Solar Flares)")
-    try:
-        url_xray = "https://services.swpc.noaa.gov/json/goes/primary/xrays-3-day.json"
-        xray_data = requests.get(url_xray).json()
-        x_times = [datetime.datetime.strptime(x["time_tag"], "%Y-%m-%dT%H:%M:%SZ") for x in xray_data]
-        short = [float(x["flux"]) for x in xray_data]
-
-        fig, ax = plt.subplots()
-        ax.plot(x_times, short, color='orange')
-        ax.set_title("X-Ray Short Flux (GOES)")
-        ax.set_ylabel("Flux (W/m²)")
-        ax.set_xlabel("UTC Time")
-        ax.set_yscale("log")
-        ax.grid(True)
-        st.pyplot(fig)
-
-        if short[-1] > 1e-5:
-            st.warning("⚠️ Possible solar flare detected!")
-        else:
-            st.success("✅ No flare activity at the moment.")
-    except:
-        st.error("Could not load X-ray data.")
-
-    # --- Kp Index ---
-    st.markdown("### 🧭 Kp Index (Geomagnetic Storms)")
-    try:
-        url_kp = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json"
-        raw_data = requests.get(url_kp).json()
-        header = raw_data[0]
-        rows = raw_data[1:]
-
-        df_kp = pd.DataFrame(rows, columns=header)
-        df_kp["time_tag"] = pd.to_datetime(df_kp["time_tag"])
-        df_kp["Kp"] = pd.to_numeric(df_kp["Kp"], errors='coerce')
-
-        fig, ax = plt.subplots()
-        ax.plot(df_kp["time_tag"], df_kp["Kp"], color='blue')
-        ax.set_title("NOAA Kp Index (Last 3 Days)")
-        ax.set_ylabel("Kp Value")
-        ax.set_xlabel("UTC Time")
-        ax.grid(True)
-        st.pyplot(fig)
-
-        latest_kp = df_kp["Kp"].iloc[-1]
-        if latest_kp >= 5:
-            st.warning(f"🌐 Geomagnetic storm conditions likely (Kp = {latest_kp})")
-        else:
-            st.success(f"✅ Geomagnetic field is quiet (Kp = {latest_kp})")
-    except Exception as e:
-        st.error(f"Could not load Kp index data: {e}")
+            if df['storm'].any():
+                storm_times = df[df['storm']]['time_tag'].dt.strftime("%Y-%m-%d %H:%M").tolist()
+                st.error(f"⚡ Cosmic ray spike(s) detected at: {', '.join(storm_times[:3])} ...")
+            else:
+                st.success("✅ No abnormal cosmic ray storm detected.")
+        except Exception as e:
+            st.error(f"Could not load or analyze cosmic ray storm data: {e}")
 
 # Tab 8: Research Library
 with tabs[7]:
