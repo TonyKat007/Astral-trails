@@ -600,10 +600,9 @@ with tabs[6]:
     import pandas as pd
 
     st.subheader("🌞 Real-Time Space Weather Monitor")
-    st.image("https://services.swpc.noaa.gov/images/animations/suvi/primary/195/latest.jpg", 
-         caption="Real-time Solar Ultraviolet Image (SUVI - 195Å)",
-         use_column_width=True)
-
+    st.image("https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMIIC.jpg",
+    caption="SDO/HMI — Real-Time Solar Activity (Magnetogram)",
+    use_container_width=True)
       # --- Solar Flare Map (Mock Locations) ---
     st.markdown("### 🌍 Solar Flare Activity Map (Mock)")
     try:
