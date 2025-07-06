@@ -600,10 +600,12 @@ with tabs[6]:
     import pandas as pd
 
     st.subheader("🌞 Real-Time Space Weather Monitor")
-    st.image("https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMIIC.jpg",
-    caption="SDO/HMI — Real-Time Solar Activity (Magnetogram)",
-    use_container_width=True)
-      # --- Solar Flare Map (Mock Locations) ---
+   image_url = "https://services.swpc.noaa.gov/images/animations/suvi/primary/195/latest.png"
+   st.image(image_url,
+    caption="GOES‑16 SUVI 195 Å — real-time solar corona image",
+    use_container_width=True) 
+
+# --- Solar Flare Map (Mock Locations) ---
     st.markdown("### 🌍 Solar Flare Activity Map (Mock)")
     try:
         m = folium.Map(location=[0, 0], zoom_start=2)
