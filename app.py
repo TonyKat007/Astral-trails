@@ -606,7 +606,7 @@ with tabs[6]:
     folium_static(flare_map)
 
      # --- Cosmic Ray Storm Tracker ---
-    with weather_tabs[3]:
+
         st.subheader("🌠 Cosmic Ray Storm Tracker")
 
         st.markdown("""
