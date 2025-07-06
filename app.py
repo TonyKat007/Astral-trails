@@ -435,8 +435,6 @@ with tabs[5]:  # Mission Dose Comparator Tab
     
     radiation_data = fetch_space_radiation_data()
 
-    radiation_data = fetch_space_radiation_data()
-
     # ---- 2. DYNAMIC SHIELDING MODEL ----
     st.subheader("🛡️ Shielding Configuration")
     col1, col2 = st.columns(2)
