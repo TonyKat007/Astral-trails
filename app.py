@@ -569,8 +569,9 @@ with tabs[5]:  # Mission Dose Comparator Tab
     st.plotly_chart(fig_sim, use_container_width=True)
 
 
-# Tab 7: Space Weather
+
 # Tab 7: Space Weather Live
+
 with tabs[6]:
     import requests
     import datetime
@@ -580,6 +581,33 @@ with tabs[6]:
     import pandas as pd
 
     st.subheader("🌞 Real-Time Space Weather Monitor")
+
+      # --- Solar Flare Map (Mock Locations) ---
+    st.markdown("### 🌍 Solar Flare Activity Map (Mock)")
+    try:
+        m = folium.Map(location=[0, 0], zoom_start=2)
+        # Random mock locations with intensity
+        flare_locations = [
+            {"lat": 20, "lon": 80, "intensity": "High"},
+            {"lat": -10, "lon": -60, "intensity": "Moderate"},
+            {"lat": 35, "lon": 120, "intensity": "Low"}
+        ]
+        for flare in flare_locations:
+            color = {"High": "red", "Moderate": "orange", "Low": "green"}[flare["intensity"]]
+            folium.CircleMarker(
+                location=[flare["lat"], flare["lon"]],
+                radius=8,
+                color=color,
+                fill=True,
+                fill_opacity=0.7,
+                popup=f"Solar Flare: {flare['intensity']}"
+            ).add_to(m)
+        folium_static(m)
+        st.caption("Note: Map shows simulated flare locations.")
+    except Exception as e:
+        st.error(f"Error rendering solar flare map: {e}")
+
+
 
     # --- Proton Flux (≥10 MeV) ---
     st.markdown("### ☢️ Proton Flux (≥10 MeV)")
@@ -655,32 +683,7 @@ with tabs[6]:
     except Exception as e:
         st.error(f"Could not load Kp index data: {e}")
 
-    # --- Solar Flare Map (Mock Locations) ---
-    st.markdown("### 🌍 Solar Flare Activity Map (Mock)")
-    try:
-        m = folium.Map(location=[0, 0], zoom_start=2)
-        # Random mock locations with intensity
-        flare_locations = [
-            {"lat": 20, "lon": 80, "intensity": "High"},
-            {"lat": -10, "lon": -60, "intensity": "Moderate"},
-            {"lat": 35, "lon": 120, "intensity": "Low"}
-        ]
-        for flare in flare_locations:
-            color = {"High": "red", "Moderate": "orange", "Low": "green"}[flare["intensity"]]
-            folium.CircleMarker(
-                location=[flare["lat"], flare["lon"]],
-                radius=8,
-                color=color,
-                fill=True,
-                fill_opacity=0.7,
-                popup=f"Solar Flare: {flare['intensity']}"
-            ).add_to(m)
-        folium_static(m)
-        st.caption("Note: Map shows simulated flare locations.")
-    except Exception as e:
-        st.error(f"Error rendering solar flare map: {e}")
-
-# Tab 8: Research Library
+  # Tab 8: Research Library
 with tabs[7]:
     st.subheader("📚 Research Paper Library")
 
