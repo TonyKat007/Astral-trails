@@ -599,12 +599,8 @@ with tabs[6]:
     from streamlit_folium import folium_static
     import pandas as pd
 
-    st.subheader("🌞 Real-Time Space Weather Monitor")
-   image_url = "https://services.swpc.noaa.gov/images/animations/suvi/primary/195/latest.png"
-   st.image(image_url,
-    caption="GOES‑16 SUVI 195 Å — real-time solar corona image",
-    use_container_width=True) 
-
+   st.subheader("🌞 Real-Time Space Weather Monitor")
+   
 # --- Solar Flare Map (Mock Locations) ---
     st.markdown("### 🌍 Solar Flare Activity Map (Mock)")
     try:
