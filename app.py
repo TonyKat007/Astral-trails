@@ -96,21 +96,38 @@ with tabs[0]:
 with tabs[1]:
     st.subheader("Live Cosmic Ray Shower Map")
     m = folium.Map(location=[0, 0], zoom_start=2, tiles="CartoDB positron")
+    shower_data = []
     for _ in range(25):
         lat, lon = random.uniform(-60, 60), random.uniform(-180, 180)
         intensity = random.choice(['Low', 'Moderate', 'High'])
         color = {'Low': 'green', 'Moderate': 'orange', 'High': 'red'}[intensity]
-        folium.CircleMarker(location=[lat, lon], radius=6, popup=f"Shower: {intensity}", color=color,
-                            fill=True, fill_opacity=0.7).add_to(m)
+    
+        # Add marker to map
+        folium.CircleMarker(
+            location=[lat, lon], radius=6, popup=f"Shower: {intensity}",
+            color=color, fill=True, fill_opacity=0.7
+        ).add_to(m)
+    
+        # Store in list
+        shower_data.append({"latitude": lat, "longitude": lon, "intensity": intensity})
+
     folium_static(m)
+
+# Convert list to DataFrame
+shower_df = pd.DataFrame(shower_data)
+
+# Now safely filter for high intensity
+high_intensity = shower_df[shower_df["intensity"] == "High"]
+
     st.markdown("###  Hotspot Detector")
     high_intensity = df[df["intensity"] == "High"]
 
     if not high_intensity.empty:
-      st.markdown("High-intensity showers detected at the following locations:")
-      st.dataframe(high_intensity[["latitude", "longitude"]])
-    else:
-      st.info("No high-intensity showers found in the current mock data.")
+    st.markdown("High-intensity showers detected at the following locations:")
+    st.dataframe(high_intensity[["latitude", "longitude"]])
+else:
+    st.info("No high-intensity showers found in the current mock data.")
+
     
 
 # Tab 3: Biological Effects
