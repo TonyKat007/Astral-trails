@@ -605,6 +605,65 @@ with tabs[6]:
 
     folium_static(flare_map)
 
+     # --- Cosmic Ray Storm Tracker ---
+    with weather_tabs[3]:
+        st.subheader("🌠 Cosmic Ray Storm Tracker")
+
+        st.markdown("""
+        This tool monitors real-time surges in cosmic ray activity (space weather storms)
+        that can affect astronauts, satellites, and space missions.
+        """)
+
+        try:
+            proton_data = requests.get("https://services.swpc.noaa.gov/json/goes/primary/integral-protons-3-day.json").json()
+            times = [datetime.strptime(d['time_tag'], "%Y-%m-%dT%H:%M:%SZ") for d in proton_data if d['energy'] == ">=10 MeV"]
+            fluxes = [float(d['flux']) for d in proton_data if d['energy'] == ">=10 MeV"]
+
+            fig, ax = plt.subplots()
+            ax.plot(times, fluxes, color='red')
+            ax.set_title("Proton Flux Activity (≥10 MeV)")
+            ax.set_ylabel("Flux (protons/cm²·s·sr)")
+            ax.set_xlabel("Time (UTC)")
+            ax.grid(True)
+            st.pyplot(fig)
+
+            threshold = 100
+            storm_times = [t for t, f in zip(times, fluxes) if f > threshold]
+
+            if storm_times:
+                st.warning(f"🚨 Cosmic Ray Storm Detected! High flux at: {storm_times[-1]} UTC")
+            else:
+                st.success("✅ No storm-level proton activity in the past 3 days.")
+
+        except Exception as e:
+            st.error(f"Could not fetch or parse proton data: {e}")
+
+        st.markdown("### 🌍 Global Radiation Risk Map (Simulated Zones)")
+
+        map = folium.Map(location=[20, 0], zoom_start=2)
+        for _ in range(15):
+            lat, lon = random.uniform(-70, 70), random.uniform(-180, 180)
+            intensity = random.choice(['Normal', 'Elevated', 'Storm'])
+            color = {'Normal': 'green', 'Elevated': 'orange', 'Storm': 'red'}[intensity]
+            folium.CircleMarker(
+                location=[lat, lon],
+                radius=7,
+                color=color,
+                fill=True,
+                fill_opacity=0.7,
+                popup=f"Region: {intensity}"
+            ).add_to(map)
+
+        folium_static(map)
+
+        st.markdown("### 🔍 Summary of Storm Events (Last 3 Days)")
+
+        if storm_times:
+            df_storms = pd.DataFrame({"Storm Time (UTC)": storm_times})
+            st.dataframe(df_storms)
+        else:
+            st.write("No storm events recorded recently.")
+
     # --- Proton Flux ---
     st.markdown("### ☢️ Proton Flux (≥10 MeV)")
     try:
