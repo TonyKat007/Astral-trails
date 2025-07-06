@@ -325,7 +325,7 @@ with tabs[3]:
     ax2.set_ylabel("Number of Devices")
     st.pyplot(fig2)
 
-    # --- Real-Time Failure Accumulation (Optional Plot) ---
+    # --- Real-Time Failure Accumulation---
     st.subheader("📈 Estimated SEU Accumulation Over Time")
     days = np.arange(1, duration + 1)
     accumulated_seus = adjusted_rate * days
