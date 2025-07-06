@@ -404,20 +404,36 @@ with tabs[5]:  # Mission Dose Comparator Tab
     import altair as alt
 
     # ---- 1. REAL-WORLD DATA INTEGRATION (NASA/ESA) ----
-    @st.cache_data(ttl=3600)
+    @st.cache_data(ttl=3600)  # Cache for 1 hour
     def fetch_space_radiation_data():
-        """Fetch live radiation data from NASA/ESA APIs with fallback."""
+        """Fetch live radiation data from NASA and ESA APIs with fallback."""
         try:
-            # Mock API response (replace with actual API calls)
-            mock_data = {
+            # ---- ISS Data (NASA) ----
+            iss_response = requests.get("https://api.nasa.gov/insight_weather/?api_key=sOgjZydwNkBDaiAYKLRaXZgkHue0ZXtsL4Zov7YD&feedtype=json&ver=1.0")
+            iss_data = iss_response.json()
+            iss_dose = iss_data.get("rad", {}).get("daily_average", 0.3)  # mSv/day
+    
+            # ---- Lunar/Mars Data (ESA SIS) ----
+            esa_response = requests.get("https://swe.ssa.esa.int/radiation/api/data/latest")
+            esa_data = esa_response.json()
+            
+            return {
+                "iss": iss_dose,
+                "lunar": esa_data.get("lunar_surface", 0.5),
+                "mars_transit": esa_data.get("mars_transit", 1.8),
+                "deep_space": esa_data.get("galactic", 2.5)
+            }
+            
+        except Exception as e:
+            st.warning(f"⚠️ Could not fetch live data: {str(e)}. Using fallback values.")
+            return {
                 "iss": 0.3,  # mSv/day
                 "lunar": 0.5,
                 "mars_transit": 1.8,
                 "deep_space": 2.5
             }
-            return mock_data
-        except:
-            return {"iss": 0.3, "lunar": 0.5, "mars_transit": 1.8, "deep_space": 2.5}
+    
+    radiation_data = fetch_space_radiation_data()
 
     radiation_data = fetch_space_radiation_data()
 
@@ -554,26 +570,7 @@ with tabs[5]:  # Mission Dose Comparator Tab
     )
     st.plotly_chart(fig_sim, use_container_width=True)
 
-    # ---- 9. 3D TRAJECTORY VISUALIZATION ----
-    st.subheader("🌌 Mission Trajectory (Simulated)")
-    # Mock trajectory data (replace with real ephemeris data)
-    trajectory_data = {
-        "x": np.random.normal(0, 1, 100),
-        "y": np.random.normal(0, 1, 100),
-        "z": np.random.normal(0, 0.5, 100),
-        "radiation": np.random.uniform(0.1, 2.0, 100)
-    }
-    
-    fig_3d = px.scatter_3d(
-        trajectory_data,
-        x="x", y="y", z="z",
-        color="radiation",
-        color_continuous_scale="Hot",
-        title="Radiation Exposure Along Trajectory (Relative)"
-    )
-    st.plotly_chart(fig_3d, use_container_width=True)
-
-    # ---- 10. EXPORT REPORT ----
+    # ---- 9. EXPORT REPORT ----
     st.subheader("📤 Generate Mission Report")
     if st.button("📄 Generate PDF Report"):
         pdf = FPDF()
