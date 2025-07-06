@@ -435,7 +435,7 @@ with tabs[5]:
 - A **1 Sv dose** is considered to increase lifetime cancer risk by ~5%.
 
 This tool helps in comparing the risk factor across different mission environments.
-    """)
+    """) 
 # Tab 7: Space Weather
 with tabs[6]:
     import requests
