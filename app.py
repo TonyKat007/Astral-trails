@@ -570,17 +570,19 @@ with tabs[5]:  # Mission Dose Comparator Tab
 
 
 # Tab 7: Space Weather
+# Tab 7: Space Weather Live
 with tabs[6]:
     import requests
     import datetime
     import matplotlib.pyplot as plt
+    import folium
+    from streamlit_folium import folium_static
+    import pandas as pd
 
     st.subheader("🌞 Real-Time Space Weather Monitor")
 
-    # ========================
-    # ☢ Proton Flux (≥10 MeV)
-    # ========================
-    st.markdown("### ☢ Proton Flux (≥10 MeV)")
+    # --- Proton Flux (≥10 MeV) ---
+    st.markdown("### ☢️ Proton Flux (≥10 MeV)")
     try:
         url_proton = "https://services.swpc.noaa.gov/json/goes/primary/integral-protons-3-day.json"
         proton_data = requests.get(url_proton).json()
@@ -599,21 +601,19 @@ with tabs[6]:
             st.warning("⚠️ Elevated proton flux — possible solar event in progress.")
         else:
             st.success("✅ Proton flux is at normal background levels.")
-    except:
-        st.error("Could not load proton flux data.")
+    except Exception as e:
+        st.error(f"Could not load proton flux data: {e}")
 
-    # ========================
-    # ⚡ X-Ray Flux
-    # ========================
+    # --- X-Ray Flux ---
     st.markdown("### ⚡ X-Ray Flux (Solar Flares)")
     try:
         url_xray = "https://services.swpc.noaa.gov/json/goes/primary/xrays-3-day.json"
         xray_data = requests.get(url_xray).json()
         x_times = [datetime.datetime.strptime(x["time_tag"], "%Y-%m-%dT%H:%M:%SZ") for x in xray_data]
-        short = [float(x["flux"]) for x in xray_data]
+        short_flux = [float(x["flux"]) for x in xray_data]
 
         fig, ax = plt.subplots()
-        ax.plot(x_times, short, color='orange')
+        ax.plot(x_times, short_flux, color='orange')
         ax.set_title("X-Ray Flux (GOES)")
         ax.set_ylabel("Flux (W/m²)")
         ax.set_xlabel("UTC Time")
@@ -621,17 +621,15 @@ with tabs[6]:
         ax.grid(True)
         st.pyplot(fig)
 
-        if short[-1] > 1e-5:
+        if short_flux[-1] > 1e-5:
             st.warning("⚠️ Possible solar flare detected!")
         else:
-            st.success("✅ No flare activity at the moment.")
-    except:
-        st.error("Could not load X-ray data.")
+            st.success("✅ No significant X-ray activity.")
+    except Exception as e:
+        st.error(f"Could not load X-ray flux data: {e}")
 
-    # ========================
-    # 🧭 Kp Index
-    # ========================
-    st.markdown("### 🧭 Kp Index (Geomagnetic Storms)")
+    # --- Kp Index ---
+    st.markdown("### 🧭 Kp Index (Geomagnetic Activity)")
     try:
         url_kp = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json"
         raw_data = requests.get(url_kp).json()
@@ -643,7 +641,7 @@ with tabs[6]:
 
         fig, ax = plt.subplots()
         ax.plot(df_kp["time_tag"], df_kp["Kp"], color='blue')
-        ax.set_title("NOAA Kp Index (Last 3 Days)")
+        ax.set_title("Kp Index (NOAA - Last 3 Days)")
         ax.set_ylabel("Kp Value")
         ax.set_xlabel("UTC Time")
         ax.grid(True)
@@ -651,41 +649,36 @@ with tabs[6]:
 
         latest_kp = df_kp["Kp"].iloc[-1]
         if latest_kp >= 5:
-            st.warning(f"🌐 Geomagnetic storm conditions likely (Kp = {latest_kp})")
+            st.warning(f"🌐 Geomagnetic storm likely (Kp = {latest_kp})")
         else:
             st.success(f"✅ Geomagnetic field is quiet (Kp = {latest_kp})")
     except Exception as e:
         st.error(f"Could not load Kp index data: {e}")
 
-    # ========================
-    # 🌠 Cosmic Ray Storm Tracker
-    # ========================
-st.markdown("### 🌠 Cosmic Ray Storm Tracker (Simulated Map)")
-
-import folium
-from streamlit_folium import folium_static
-import random
-
-# Create an independent map inside Tab 7
-space_weather_map = folium.Map(location=[0, 0], zoom_start=2, tiles="Stamen Terrain")
-
-# Add some simulated storm points
-for _ in range(20):
-    lat, lon = random.uniform(-60, 60), random.uniform(-180, 180)
-    intensity = random.choice(["Low", "Moderate", "High"])
-    color = {"Low": "green", "Moderate": "orange", "High": "red"}[intensity]
-
-    folium.CircleMarker(
-        location=[lat, lon],
-        radius=6,
-        popup=f"Event Intensity: {intensity}",
-        color=color,
-        fill=True,
-        fill_opacity=0.6
-    ).add_to(space_weather_map)
-
-# Render map
-folium_static(space_weather_map)
+    # --- Solar Flare Map (Mock Locations) ---
+    st.markdown("### 🌍 Solar Flare Activity Map (Mock)")
+    try:
+        m = folium.Map(location=[0, 0], zoom_start=2)
+        # Random mock locations with intensity
+        flare_locations = [
+            {"lat": 20, "lon": 80, "intensity": "High"},
+            {"lat": -10, "lon": -60, "intensity": "Moderate"},
+            {"lat": 35, "lon": 120, "intensity": "Low"}
+        ]
+        for flare in flare_locations:
+            color = {"High": "red", "Moderate": "orange", "Low": "green"}[flare["intensity"]]
+            folium.CircleMarker(
+                location=[flare["lat"], flare["lon"]],
+                radius=8,
+                color=color,
+                fill=True,
+                fill_opacity=0.7,
+                popup=f"Solar Flare: {flare['intensity']}"
+            ).add_to(m)
+        folium_static(m)
+        st.caption("Note: Map shows simulated flare locations.")
+    except Exception as e:
+        st.error(f"Error rendering solar flare map: {e}")
 
 # Tab 8: Research Library
 with tabs[7]:
