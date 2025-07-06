@@ -600,6 +600,10 @@ with tabs[6]:
     import pandas as pd
 
     st.subheader("🌞 Real-Time Space Weather Monitor")
+    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Planets2013.svg/1920px-Planets2013.svg.png", 
+         caption="Schematic view of the Solar System (not to scale)",
+         use_column_width=True)
+
 
       # --- Solar Flare Map (Mock Locations) ---
     st.markdown("### 🌍 Solar Flare Activity Map (Mock)")
