@@ -221,6 +221,7 @@ with tabs[1]:
 
     #===show map===
     folium_static(m)
+    st.write("We acknowledge the NMDB database www.nmdb.eu, founded under the European Union's FP7 programme (contract no. 213007) for providing data.")
 
 # Tab 3: Biological Effects
 with tabs[2]:
