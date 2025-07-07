@@ -8,6 +8,7 @@ import folium
 import random
 from streamlit_folium import folium_static
 import plotly.graph_objects as go
+from io import StringIO
 
 # App configuration
 st.set_page_config(
@@ -113,16 +114,112 @@ with tabs[0]:
     st.pyplot(fig2)
 
 
-# TAB 2: Live Cosmic Ray Shower Map (mock)
+# TAB 2: Live Cosmic Ray Shower Map (real-time but not live)
 with tabs[1]:
     st.subheader("Live Cosmic Ray Shower Map")
     m = folium.Map(location=[0, 0], zoom_start=2, tiles="CartoDB positron")
-    for _ in range(25):
-        lat, lon = random.uniform(-60, 60), random.uniform(-180, 180)
-        intensity = random.choice(['Low', 'Moderate', 'High'])
-        color = {'Low': 'green', 'Moderate': 'orange', 'High': 'red'}[intensity]
-        folium.CircleMarker(location=[lat, lon], radius=6, popup=f"Shower: {intensity}", color=color,
-                            fill=True, fill_opacity=0.7).add_to(m)
+
+    # ===fetch data===
+    data_data= pd.read_csv("TimeStamp.csv")
+
+    # ===Process it===
+    data_data.replace("null", pd.NA, inplace=True)
+    data_data["TimeStamp"] = pd.to_datetime(data_data["TimeStamp"])
+    for col in data_data.columns:
+        if col != "TimeStamp":
+            data_data[col] = pd.to_numeric(data_data[col], errors="coerce")
+    latest = data_data.iloc[-1]
+    latest_time = latest["TimeStamp"]    
+    station_counts= latest.drop("TimeStamp").to_dict()
+
+    #st.write("Station counts (latest row):", station_counts)
+
+    # ===plotting points===
+    
+    station_coords = {
+    "  ICRB": (28.3, -16.51),
+    "     ICRO": (27.3, -15.51),
+    "    ATHN": (37.98, 23.73),
+    "    CALM": (39.2, -3.2),
+    "    BKSN": (43.28, 42.69),
+    "    JUNG": (46.55, 7.98),
+    "   JUNG1": (45.55, 6.98),
+    "    LMKS": (49.2, 20.22),
+    "    IRK2": (52.3, 104.3),
+    "    DRBS": (50.1, 4.6),
+    "    NEWK": (39.68, -75.75),
+    "   KIEL2": (54.32, 10.13),
+    "    YKTK": (62.02, 129.7),
+    "    KERG": (-49.35, 70.25),
+    "    CALG": (51.05, -114.07),
+    "    OULU": (65.05, 25.47),
+    "    APTY": (67.57, 33.38),
+    "    TXBY": (71.58, 128.92),
+    "    FSMT": (60.02, -111.93),
+    "    INVK": (68.36, -133.72),
+    "    NAIN": (56.55, -61.68),
+    "    PWNK": (54.98, -85.43),
+    "    THUL": (76.51, -68.71),
+    "    MWSB": (-67.6, 62.88),
+    "    MWSN": (-66.6, 61.88),
+    "    SOPB": (-90.0, 0.0),
+    "    SOPO": (-85.0, 2.0),
+    "    TERA": (-66.67, 140.01),
+    }
+
+      # ====intensity filter====
+    st.markdown("### 🔍 Filter Shower Events")
+    intensity_options = st.multiselect(
+        "Select intensity levels to display",
+        options=["Low", "Moderate", "High"],
+        default=["Low", "Moderate", "High"]
+    )
+
+    def get_intensity_level(count):
+        if pd.isna(count):
+            return "No Data"
+        elif count > 200:
+            return "High"
+        elif count < 200 and count > 100:
+            return "Moderate"
+        else:
+            return "Low"
+    # ===color based on intensity===
+    def get_color(count):
+        if count > 200:
+            return 'red'
+        elif count < 200 and count > 100:
+            return 'orange'
+        else:
+            return 'green'
+    
+    #===plotting on map===
+    for station, count in station_counts.items():
+        if station in station_coords and pd.notna(count):
+            lat, lon = station_coords[station]
+            intensity = get_intensity_level(count)
+            if intensity not in intensity_options:
+                continue  # Skip this station if user has filtered it out
+
+            if pd.isna(count):
+                color = "gray"
+            else:
+                color = {
+                        "Low": "green",
+                        "Moderate": "orange",
+                        "High": "red"
+                    }.get(intensity, "gray")
+            color = get_color(count)
+            folium.CircleMarker(
+                location=[lat, lon],
+                radius=7,
+                color=color,
+                popup=f"Station: {station}\nRelative Neutron Count: {count}\nDate: \nTime: ",
+                fill=True,
+                fill_opacity=0.7
+            ).add_to(m)
+
+    #===show map===
     folium_static(m)
 
 # Tab 3: Biological Effects
