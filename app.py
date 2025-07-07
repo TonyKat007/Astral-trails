@@ -114,10 +114,10 @@ with tabs[0]:
     st.pyplot(fig2)
 
 
-# TAB 2: Live Cosmic Ray Shower Map (real-time but not live)
+# ===========================================TAB 2: Live Cosmic Ray Shower Map (real-time but not live)====================================================
 with tabs[1]:
     st.subheader("Live Cosmic Ray Shower Map")
-    m = folium.Map(location=[0, 0], zoom_start=2, tiles="CartoDB positron")
+    m = folium.Map(location=[0, 0], zoom_start=2)
 
     # ===fetch data===
     data_data= pd.read_csv("TimeStamp.csv")
