@@ -172,7 +172,7 @@ with tabs[1]:
     intensity_options = st.multiselect(
         "Select intensity levels to display",
         options=["Low", "Moderate", "High"],
-        default=["Low", "Moderate", "High"]
+        default=[ ]
     )
 
     def get_intensity_level(count):
