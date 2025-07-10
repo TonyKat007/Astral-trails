@@ -708,18 +708,9 @@ with tabs[6]:
     """
 
     st.components.v1.html(iframe_html, height=520)
-
-    st.subheader("Live Solar Activity")
-    components.html(
-        """
-        <iframe src="https://meteoagent.com/your-widget-code"
-         width="600" height="400"></iframe>
-        """,
-        height=400
-    )
     
     # --- Proton Flux (≥10 MeV) ---
-    st.markdown("### ☢️ Proton Flux (≥10 MeV)")
+    st.markdown("### Proton Flux (≥10 MeV)")
     try:
         url_proton = "https://services.swpc.noaa.gov/json/goes/primary/integral-protons-3-day.json"
         proton_data = requests.get(url_proton).json()
@@ -735,14 +726,14 @@ with tabs[6]:
         st.pyplot(fig)
 
         if fluxes[-1] > 100:
-            st.warning("⚠️ Elevated proton flux — possible solar event in progress.")
+            st.warning("Elevated proton flux — possible solar event in progress.")
         else:
-            st.success("✅ Proton flux is at normal background levels.")
+            st.success("Proton flux is at normal background levels.")
     except Exception as e:
         st.error(f"Could not load proton flux data: {e}")
 
     # --- X-Ray Flux ---
-    st.markdown("### ⚡ X-Ray Flux (Solar Flares)")
+    st.markdown("### X-Ray Flux (Solar Flares)")
     try:
         url_xray = "https://services.swpc.noaa.gov/json/goes/primary/xrays-3-day.json"
         xray_data = requests.get(url_xray).json()
@@ -759,14 +750,14 @@ with tabs[6]:
         st.pyplot(fig)
 
         if short_flux[-1] > 1e-5:
-            st.warning("⚠️ Possible solar flare detected!")
+            st.warning("Possible solar flare detected!")
         else:
-            st.success("✅ No significant X-ray activity.")
+            st.success("No significant X-ray activity.")
     except Exception as e:
         st.error(f"Could not load X-ray flux data: {e}")
 
     # --- Kp Index ---
-    st.markdown("### 🧭 Kp Index (Geomagnetic Activity)")
+    st.markdown("### Kp Index (Geomagnetic Activity)")
     try:
         url_kp = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json"
         raw_data = requests.get(url_kp).json()
@@ -786,14 +777,14 @@ with tabs[6]:
 
         latest_kp = df_kp["Kp"].iloc[-1]
         if latest_kp >= 5:
-            st.warning(f"🌐 Geomagnetic storm likely (Kp = {latest_kp})")
+            st.warning(f"Geomagnetic storm likely (Kp = {latest_kp})")
         else:
-            st.success(f"✅ Geomagnetic field is quiet (Kp = {latest_kp})")
+            st.success(f"Geomagnetic field is quiet (Kp = {latest_kp})")
     except Exception as e:
         st.error(f"Could not load Kp index data: {e}")
 
     # --- Solar Flare Map (Mock Locations) ---
-    st.markdown("### 🌍 Solar Flare Activity Map (Mock)")
+    st.markdown("### Solar Flare Activity Map (Mock)")
     try:
         m = folium.Map(location=[0, 0], zoom_start=2)
         # Random mock locations with intensity
