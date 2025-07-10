@@ -707,6 +707,15 @@ with tabs[6]:
 
     st.components.v1.html(iframe_html, height=520)
 
+    st.subheader("Live Solar Activity")
+    components.html(
+        """
+        <iframe src="https://meteoagent.com/your-widget-code"
+         width="600" height="400"></iframe>
+        """,
+        height=400
+    )
+    
     # --- Proton Flux (≥10 MeV) ---
     st.markdown("### ☢️ Proton Flux (≥10 MeV)")
     try:
