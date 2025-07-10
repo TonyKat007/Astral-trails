@@ -692,8 +692,62 @@ with tabs[6]:
     import folium
     from streamlit_folium import folium_static
     import pandas as pd
-
+    
     st.subheader("🌞 Real-Time Space Weather Monitor")
+    import plotly.graph_objects as go
+    import streamlit as st
+
+    st.subheader("🛰️ 3D Space Weather Simulation: Sun → Earth → Solar Wind")
+
+    # Coordinates
+    sun_x, sun_y, sun_z = 0, 0, 0
+    earth_x, earth_y, earth_z = 100, 0, 0  # 1 AU scaled down
+
+    # Create figure
+    fig = go.Figure()
+
+    # Sun
+    fig.add_trace(go.Scatter3d(
+        x=[sun_x], y=[sun_y], z=[sun_z],
+        mode='markers',
+        marker=dict(size=20, color='gold'),
+        name='Sun'
+    ))
+
+    # Earth
+    fig.add_trace(go.Scatter3d(
+        x=[earth_x], y=[earth_y], z=[earth_z],
+        mode='markers',
+        marker=dict(size=8, color='blue'),
+        name='Earth' 
+    ))
+
+    # Solar wind vector (as a cone from Sun to Earth)
+    fig.add_trace(go.Cone(
+        x=[sun_x], y=[sun_y], z=[sun_z],
+        u=[earth_x - sun_x],
+        v=[earth_y - sun_y],
+        w=[earth_z - sun_z],
+        sizemode="absolute",
+        sizeref=50,
+        anchor="tail",
+        colorscale="Reds",
+        name="Solar Wind"
+    ))
+
+    # Layout
+    fig.update_layout(
+        scene=dict(
+            xaxis=dict(title='X', showgrid=False, zeroline=False),
+            yaxis=dict(title='Y', showgrid=False, zeroline=False),
+            zaxis=dict(title='Z', showgrid=False, zeroline=False),
+            aspectmode='data'
+        ),
+        margin=dict(l=0, r=0, t=40, b=0),
+        title="Simplified 3D View: Sun, Earth, and Solar Wind"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
 
     # --- Proton Flux (≥10 MeV) ---
     st.markdown("### ☢️ Proton Flux (≥10 MeV)")
