@@ -694,68 +694,18 @@ with tabs[6]:
     import pandas as pd
     
     st.subheader("Real-Time Space Weather Monitor")
-    import plotly.graph_objects as go
+    
     import streamlit as st
-    import numpy as np
-    
-    st.subheader("3D Space Weather Simulation: Sun → Earth → Solar Wind")
+    iframe_html = """
+    <iframe
+        src="https://eyes.nasa.gov/apps/solar-system/#/home?embed=true&logo=false&menu=false"
+        width="100%"
+        height="500px"
+        frameborder="0"
+    ></iframe>
+    """
 
-    # Coordinates
-    sun = np.array([0, 0, 0])
-    earth = np.array([100, 0, 0])  # Scaled 1 AU
-
-    # Direction vector (normalized)
-    direction = earth - sun
-    unit_vector = direction / np.linalg.norm(direction)
-    scaled_vector = unit_vector * 2  # scale to manageable length for cone
-    
-    # Create figure
-    fig = go.Figure()
-
-    # Sun
-    fig.add_trace(go.Scatter3d(
-        x=[sun[0]], y=[sun[1]], z=[sun[2]],
-        mode='markers',
-        marker=dict(size=15, color='gold'),
-        name='Sun'
-    ))
-
-    # Earth
-    fig.add_trace(go.Scatter3d(
-        x=[earth[0]], y=[earth[1]], z=[earth[2]],
-        mode='markers',
-        marker=dict(size=7, color='blue'),
-        name='Earth'
-    ))
-
-    # Solar wind vector (as a cone from Sun to Earth)
-    fig.add_trace(go.Cone(
-        x=[sun[0]], y=[sun[1]], z=[sun[2]],
-        u=[scaled_vector[0]],
-        v=[scaled_vector[1]],
-        w=[scaled_vector[2]],
-        sizemode="absolute",
-        sizeref=5,
-        anchor="tail",
-        showscale=False,
-        colorscale="Reds",
-        name="Solar Wind"
-    ))
-
-    # Layout
-    fig.update_layout(
-        scene=dict(
-            xaxis=dict(title='X', range=[-20, 120], showgrid=False),
-            yaxis=dict(title='Y', range=[-60, 60], showgrid=False),
-            zaxis=dict(title='Z', range=[-60, 60], showgrid=False),
-            aspectmode='manual',
-            aspectratio=dict(x=2, y=1, z=1)
-        ),
-        margin=dict(l=0, r=0, t=40, b=0),
-        title="Sun, Earth, and Solar Wind Vector (Scaled)"
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
+    st.components.v1.html(iframe_html, height=520)
 
     # --- Proton Flux (≥10 MeV) ---
     st.markdown("### ☢️ Proton Flux (≥10 MeV)")
