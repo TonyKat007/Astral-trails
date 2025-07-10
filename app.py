@@ -9,6 +9,8 @@ import random
 from streamlit_folium import folium_static
 import plotly.graph_objects as go
 from io import StringIO
+import streamlit.components.v1 as components
+
 
 # App configuration
 st.set_page_config(
