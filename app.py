@@ -693,12 +693,12 @@ with tabs[6]:
     from streamlit_folium import folium_static
     import pandas as pd
     
-    st.subheader("🌞 Real-Time Space Weather Monitor")
+    st.subheader("Real-Time Space Weather Monitor")
     import plotly.graph_objects as go
     import streamlit as st
     import numpy as np
     
-    st.subheader("🛰️ 3D Space Weather Simulation: Sun → Earth → Solar Wind")
+    st.subheader("3D Space Weather Simulation: Sun → Earth → Solar Wind")
 
     # Coordinates
     sun = np.array([0, 0, 0])
@@ -707,7 +707,7 @@ with tabs[6]:
     # Direction vector (normalized)
     direction = earth - sun
     unit_vector = direction / np.linalg.norm(direction)
-    scaled_vector = unit_vector * 20  # scale to manageable length for cone
+    scaled_vector = unit_vector * 2  # scale to manageable length for cone
     
     # Create figure
     fig = go.Figure()
