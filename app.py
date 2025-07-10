@@ -51,7 +51,7 @@ tabs = st.tabs([
 # === TAB 1: Radiation Risk Calculator ===
 with tabs[0]:
     st.subheader("Radiation Risk Calculator")
-    mission_days = st.slider("Mission Duration (days)", 1, 1000, 180)
+    mission_days = st.slider("Mission Duration (in days)", 1, 1000, 180)
     shielding_material = st.selectbox(
     "Shielding Material", 
     ["None", "Aluminum", "Polyethylene", "Lead", "Water", "Titanium", "Carbon Fiber", "Hydrogen-rich Plastic"]
