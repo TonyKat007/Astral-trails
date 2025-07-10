@@ -524,26 +524,26 @@ with tabs[5]:  # Mission Dose Comparator Tab
 
     # ---- 1. REAL-WORLD DATA INTEGRATION (NASA/ESA) ----
     @st.cache_data(ttl=3600)
-def fetch_space_radiation_data():
-    """Fetch live radiation data from ESA API only. NASA's InSight API is deprecated."""
-    try:
-        esa_response = requests.get("https://swe.ssa.esa.int/radiation/api/data/latest")
-        esa_data = esa_response.json()
+    def fetch_space_radiation_data():
+        """Fetch live radiation data from ESA API only. NASA's InSight API is deprecated."""
+        try:
+            esa_response = requests.get("https://swe.ssa.esa.int/radiation/api/data/latest")
+            esa_data = esa_response.json()
 
-        return {
+            return {
             "iss": 0.3,  # Fallback or hardcoded ISS value
             "lunar": esa_data.get("lunar_surface", 0.5),
             "mars_transit": esa_data.get("mars_transit", 1.8),
             "deep_space": esa_data.get("galactic", 2.5)
-        }
-    except Exception as e:
-        st.warning(f"⚠️ Could not fetch ESA data: {str(e)}. Using fallback values.")
-        return {
-            "iss": 0.3,
-            "lunar": 0.5,
-            "mars_transit": 1.8,
-            "deep_space": 2.5
-        }
+            }
+            except Exception as e:
+                st.warning(f"⚠️ Could not fetch ESA data: {str(e)}. Using fallback values.")
+            return {
+                "iss": 0.3,
+                "lunar": 0.5,
+                "mars_transit": 1.8,
+                "deep_space": 2.5
+            }
 
     
     radiation_data = fetch_space_radiation_data()
