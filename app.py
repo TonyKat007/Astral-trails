@@ -695,7 +695,7 @@ with tabs[6]:
     from streamlit_folium import folium_static
     import pandas as pd
     
-    st.subheader("Real-Time Space Weather Monitor")
+    st.subheader("Real-Time Solar System Monitor")
     
     import streamlit as st
     iframe_html = """
@@ -810,7 +810,7 @@ with tabs[6]:
 
 # Tab 8: Research Library
 with tabs[7]:
-    st.subheader("📚 Research Paper Library")
+    st.subheader("Research Paper Library")
 
     st.markdown("""
     Browse handpicked research papers on cosmic rays, radiation health, and space missions.
