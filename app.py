@@ -372,13 +372,13 @@ with tabs[2]:
     
 # Tab 4: Effects on Electronics
 with tabs[3]:
-    st.subheader("💻 Effects of Cosmic Radiation on Electronics")
+    st.subheader("Effects of Cosmic Radiation on Electronics")
 
     # --- Inputs ---
-    mission_profile = st.selectbox("🛰 Mission Environment", ["ISS (LEO)", "Lunar Orbit", "Mars Transit", "Deep Space"])
-    duration = st.slider("🕒 Mission Duration (days)", 1, 1000, 180)
-    shielding = st.selectbox("🛡️ Shielding Level", ["None", "Light", "Heavy"])
-    sensitivity = st.selectbox("📦 Electronics Sensitivity", ["Standard", "Hardened", "Critical"])
+    mission_profile = st.selectbox("Mission Environment", ["ISS (LEO)", "Lunar Orbit", "Mars Transit", "Deep Space"])
+    duration = st.slider("Mission Duration (days)", 1, 1000, 180)
+    shielding = st.selectbox("Shielding Level", ["None", "Light", "Heavy"])
+    sensitivity = st.selectbox("Electronics Sensitivity", ["Standard", "Hardened", "Critical"])
 
     # --- Mission profile base SEU rate (mocked SPENVIS/ESA data in Ups/day) ---
     mission_base_rates = {
@@ -416,11 +416,11 @@ with tabs[3]:
         risk = "High"
         color = "red"
 
-    st.metric("📉 Estimated SEUs", f"{total_seus:.2f}")
-    st.success(f"⚠️ Failure Risk Level: {risk}")
+    st.metric("Estimated SEUs", f"{total_seus:.2f}")
+    st.success(f"Failure Risk Level: {risk}")
 
     # --- SEU Rate vs Shielding ---
-    st.subheader("📊 SEU Rate vs Shielding")
+    st.subheader("SEU Rate vs Shielding")
 
     levels = ["None", "Light", "Heavy"]
     rates = [base_seu_rate * sensitivity_factor[sensitivity] * shielding_factor[lev] * duration for lev in levels]
@@ -432,7 +432,7 @@ with tabs[3]:
     st.pyplot(fig1)
 
     # --- Monte Carlo Distribution ---
-    st.subheader("🎲 Monte Carlo Simulation (1000 Devices)")
+    st.subheader("Monte Carlo Simulation (1000 Devices)")
     simulated_failures = np.random.normal(loc=total_seus, scale=0.2 * total_seus, size=1000)
     simulated_failures = np.clip(simulated_failures, 0, None)
 
@@ -444,7 +444,7 @@ with tabs[3]:
     st.pyplot(fig2)
 
     # --- Real-Time Failure Accumulation---
-    st.subheader("📈 Estimated SEU Accumulation Over Time")
+    st.subheader("Estimated SEU Accumulation Over Time")
     days = np.arange(1, duration + 1)
     accumulated_seus = adjusted_rate * days
 
@@ -523,34 +523,28 @@ with tabs[5]:  # Mission Dose Comparator Tab
     import altair as alt
 
     # ---- 1. REAL-WORLD DATA INTEGRATION (NASA/ESA) ----
-    @st.cache_data(ttl=3600)  # Cache for 1 hour
-    def fetch_space_radiation_data():
-        """Fetch live radiation data from NASA and ESA APIs with fallback."""
-        try:
-            # ---- ISS Data (NASA) ----
-            iss_response = requests.get("https://api.nasa.gov/insight_weather/?api_key=sOgjZydwNkBDaiAYKLRaXZgkHue0ZXtsL4Zov7YD&feedtype=json&ver=1.0")
-            iss_data = iss_response.json()
-            iss_dose = iss_data.get("rad", {}).get("daily_average", 0.3)  # mSv/day
-    
-            # ---- Lunar/Mars Data (ESA SIS) ----
-            esa_response = requests.get("https://swe.ssa.esa.int/radiation/api/data/latest")
-            esa_data = esa_response.json()
-            
-            return {
-                "iss": iss_dose,
-                "lunar": esa_data.get("lunar_surface", 0.5),
-                "mars_transit": esa_data.get("mars_transit", 1.8),
-                "deep_space": esa_data.get("galactic", 2.5)
-            }
-            
-        except Exception as e:
-            st.warning(f"⚠️ Could not fetch live data: {str(e)}. Using fallback values.")
-            return {
-                "iss": 0.3,  # mSv/day
-                "lunar": 0.5,
-                "mars_transit": 1.8,
-                "deep_space": 2.5
-            }
+    @st.cache_data(ttl=3600)
+def fetch_space_radiation_data():
+    """Fetch live radiation data from ESA API only. NASA's InSight API is deprecated."""
+    try:
+        esa_response = requests.get("https://swe.ssa.esa.int/radiation/api/data/latest")
+        esa_data = esa_response.json()
+
+        return {
+            "iss": 0.3,  # Fallback or hardcoded ISS value
+            "lunar": esa_data.get("lunar_surface", 0.5),
+            "mars_transit": esa_data.get("mars_transit", 1.8),
+            "deep_space": esa_data.get("galactic", 2.5)
+        }
+    except Exception as e:
+        st.warning(f"⚠️ Could not fetch ESA data: {str(e)}. Using fallback values.")
+        return {
+            "iss": 0.3,
+            "lunar": 0.5,
+            "mars_transit": 1.8,
+            "deep_space": 2.5
+        }
+
     
     radiation_data = fetch_space_radiation_data()
 
