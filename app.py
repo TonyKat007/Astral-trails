@@ -536,8 +536,8 @@ with tabs[5]:  # Mission Dose Comparator Tab
             "mars_transit": esa_data.get("mars_transit", 1.8),
             "deep_space": esa_data.get("galactic", 2.5)
             }
-            except Exception as e:
-                st.warning(f"⚠️ Could not fetch ESA data: {str(e)}. Using fallback values.")
+        except Exception as e:
+            st.warning(f"⚠️ Could not fetch ESA data: {str(e)}. Using fallback values.")
             return {
                 "iss": 0.3,
                 "lunar": 0.5,
