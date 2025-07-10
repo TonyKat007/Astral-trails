@@ -657,16 +657,16 @@ with tabs[5]:  # Mission Dose Comparator Tab
     st.plotly_chart(fig_compare, use_container_width=True)
 
     # ---- 7. RISK ALERTS ----
-    st.subheader("⚠️ Risk Assessment")
+    st.subheader("Risk Assessment")
     if total_dose > 1000:
-        st.error(f"🚨 DANGER: {total_dose:.1f} mSv exceeds NASA career limit (1000 mSv)")
+        st.error(f"DANGER: {total_dose:.1f} mSv exceeds NASA career limit (1000 mSv)")
     elif total_dose > 500:
-        st.warning(f"⚠️ WARNING: {total_dose:.1f} mSv exceeds 1-year limit (500 mSv)")
+        st.warning(f"WARNING: {total_dose:.1f} mSv exceeds 1-year limit (500 mSv)")
     else:
-        st.success(f"✅ SAFE: {total_dose:.1f} mSv within allowable limits")
+        st.success(f"SAFE: {total_dose:.1f} mSv within allowable limits")
 
     # ---- 8. MONTE CARLO SIMULATION ----
-    st.subheader("🎲 Dose Uncertainty Simulation")
+    st.subheader("Dose Uncertainty Simulation")
     simulated_doses = np.random.normal(
         loc=total_dose,
         scale=total_dose*0.25,  # 25% variability
@@ -696,41 +696,48 @@ with tabs[6]:
     st.subheader("🌞 Real-Time Space Weather Monitor")
     import plotly.graph_objects as go
     import streamlit as st
-
+    import numpy as np
+    
     st.subheader("🛰️ 3D Space Weather Simulation: Sun → Earth → Solar Wind")
 
     # Coordinates
-    sun_x, sun_y, sun_z = 0, 0, 0
-    earth_x, earth_y, earth_z = 100, 0, 0  # 1 AU scaled down
+    sun = np.array([0, 0, 0])
+    earth = np.array([100, 0, 0])  # Scaled 1 AU
 
+    # Direction vector (normalized)
+    direction = earth - sun
+    unit_vector = direction / np.linalg.norm(direction)
+    scaled_vector = unit_vector * 20  # scale to manageable length for cone
+    
     # Create figure
     fig = go.Figure()
 
     # Sun
     fig.add_trace(go.Scatter3d(
-        x=[sun_x], y=[sun_y], z=[sun_z],
+        x=[sun[0]], y=[sun[1]], z=[sun[2]],
         mode='markers',
-        marker=dict(size=20, color='gold'),
+        marker=dict(size=15, color='gold'),
         name='Sun'
     ))
 
     # Earth
     fig.add_trace(go.Scatter3d(
-        x=[earth_x], y=[earth_y], z=[earth_z],
+        x=[earth[0]], y=[earth[1]], z=[earth[2]],
         mode='markers',
-        marker=dict(size=8, color='blue'),
-        name='Earth' 
+        marker=dict(size=7, color='blue'),
+        name='Earth'
     ))
 
     # Solar wind vector (as a cone from Sun to Earth)
     fig.add_trace(go.Cone(
-        x=[sun_x], y=[sun_y], z=[sun_z],
-        u=[earth_x - sun_x],
-        v=[earth_y - sun_y],
-        w=[earth_z - sun_z],
+        x=[sun[0]], y=[sun[1]], z=[sun[2]],
+        u=[scaled_vector[0]],
+        v=[scaled_vector[1]],
+        w=[scaled_vector[2]],
         sizemode="absolute",
-        sizeref=50,
+        sizeref=5,
         anchor="tail",
+        showscale=False,
         colorscale="Reds",
         name="Solar Wind"
     ))
@@ -738,13 +745,14 @@ with tabs[6]:
     # Layout
     fig.update_layout(
         scene=dict(
-            xaxis=dict(title='X', showgrid=False, zeroline=False),
-            yaxis=dict(title='Y', showgrid=False, zeroline=False),
-            zaxis=dict(title='Z', showgrid=False, zeroline=False),
-            aspectmode='data'
+            xaxis=dict(title='X', range=[-20, 120], showgrid=False),
+            yaxis=dict(title='Y', range=[-60, 60], showgrid=False),
+            zaxis=dict(title='Z', range=[-60, 60], showgrid=False),
+            aspectmode='manual',
+            aspectratio=dict(x=2, y=1, z=1)
         ),
         margin=dict(l=0, r=0, t=40, b=0),
-        title="Simplified 3D View: Sun, Earth, and Solar Wind"
+        title="Sun, Earth, and Solar Wind Vector (Scaled)"
     )
 
     st.plotly_chart(fig, use_container_width=True)
