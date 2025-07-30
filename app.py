@@ -882,54 +882,33 @@ with tabs[7]:
 
 # Tab 9: cosmic ray data explorerwith tabs[8]:
 with tabs[8]:
-    st.subheader("📤 Upload and Analyze Your Data")
-
-    st.markdown("""
-    Upload your **CSV** file containing cosmic ray or radiation data. The app will:
-    - Preview your data
-    - Show summary statistics
-    - Visualize selected columns
-    """)
-
-    # Upload CSV
-    uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
-
+    st.subheader("📤 Upload & Analyze Your Own Cosmic Ray Dataset")
+    uploaded_file = st.file_uploader("Upload your CSV file (must include 'Energy' and 'Flux' columns, max 2MB)", type=["csv"])
     if uploaded_file is not None:
-        import pandas as pd
-
-        # Read CSV
-        try:
-            df = pd.read_csv(uploaded_file)
-            st.success("✅ File uploaded and read successfully!")
-
-            # Show preview
-            st.markdown("### 📋 Data Preview")
-            st.dataframe(df.head())
-
-            # Show summary
-            st.markdown("### 📊 Summary Statistics")
-            st.write(df.describe())
-
-            # Select columns for plotting
-            numeric_cols = df.select_dtypes(include=["float64", "int64"]).columns.tolist()
-            if len(numeric_cols) >= 2:
-                st.markdown("### 📈 Data Visualization")
-                x_col = st.selectbox("Select X-axis", numeric_cols, key="x_axis")
-                y_col = st.selectbox("Select Y-axis", numeric_cols, key="y_axis")
-
-                st.line_chart(df[[x_col, y_col]])
-
-            else:
-                st.warning("Not enough numeric columns to plot.")
-
-            # Optional: Check for radiation-related columns
-            if "radiation_count" in df.columns:
-                st.markdown("### ☢️ Radiation Stats")
-                st.write("Average Radiation:", df["radiation_count"].mean())
-                st.write("Max Radiation Spike:", df["radiation_count"].max())
-
-        except Exception as e:
-            st.error(f"⚠️ Error reading file: {e}")
+        if uploaded_file.size > 2 * 1024 * 1024:
+            st.error("File too large. Please upload a file smaller than 2MB.")
+        else:
+            try:
+                df = pd.read_csv(uploaded_file)
+                if 'Energy' in df.columns and 'Flux' in df.columns:
+                    st.success("File uploaded and read successfully!")
+                    st.markdown("### Preview of Uploaded Data")
+                    st.dataframe(df.head())
+                    log_scale = st.checkbox("Log scale", value=True)
+                    fig, ax = plt.subplots()
+                    ax.plot(df['Energy'], df['Flux'], marker='o', linestyle='-', color='blue')
+                    ax.set_xlabel("Energy")
+                    ax.set_ylabel("Flux")
+                    ax.set_title("Uploaded Cosmic Ray Spectrum")
+                    if log_scale:
+                        ax.set_yscale("log")
+                        ax.set_xscale("log")
+                    ax.grid(True, which='both', linestyle='--', alpha=0.5)
+                    st.pyplot(fig)
+                else:
+                    st.error("CSV must contain 'Energy' and 'Flux' columns.")
+            except Exception as e:
+                st.error(f"Error reading file: {e}")
 
 
 # FOOTER
