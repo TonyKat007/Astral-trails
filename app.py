@@ -118,16 +118,15 @@ with tabs[0]:
 
 # ===========================================TAB 2: Live Cosmic Ray Shower Map (real-time but not live)====================================================
 with tabs[1]:
-# Tab 7: Space Weather Live
     import datetime
     import matplotlib.pyplot as plt
     import folium
     from streamlit_folium import folium_static
     import pandas as pd
 
-    st.subheader("🌞 Real-Time Space Weather Dashboard")
+    st.subheader("Real-Time Space Weather Dashboard")
 
-    st.markdown("### ☀️ 1. Real-Time Solar Images")
+    st.markdown("### 1. Real-Time Solar Images")
     col1, col2 = st.columns(2)
     with col1:
         st.image("https://services.swpc.noaa.gov/images/animations/lasco-c2/latest.jpg", 
@@ -137,14 +136,14 @@ with tabs[1]:
                  caption="SUVI 195Å Solar Corona", use_column_width=True)
 
     st.markdown("---")
-    st.markdown("### 🌌 2. Aurora Forecast Map")
+    st.markdown("### 2. Aurora Forecast Map")
     st.image("https://services.swpc.noaa.gov/images/aurora-forecast-northern-hemisphere.jpg", 
              caption="NOAA Aurora Forecast (Northern Hemisphere)", use_column_width=True)
     st.image("https://services.swpc.noaa.gov/images/aurora-forecast-southern-hemisphere.jpg", 
              caption="NOAA Aurora Forecast (Southern Hemisphere)", use_column_width=True)
 
     st.markdown("---")
-    st.markdown("### 🛰 3. ISS Position Tracker")
+    st.markdown("### 3. ISS Position Tracker")
     try:
         iss_data = requests.get("http://api.open-notify.org/iss-now.json").json()
         iss_lat = float(iss_data['iss_position']['latitude'])
@@ -159,7 +158,7 @@ with tabs[1]:
         st.warning("Could not fetch ISS position at the moment.")
 
     st.markdown("---")
-    st.markdown("### ☢ 4. Proton Flux (≥10 MeV)")
+    st.markdown("### 4. Proton Flux (≥10 MeV)")
     try:
         url_proton = "https://services.swpc.noaa.gov/json/goes/primary/integral-protons-3-day.json"
         proton_data = requests.get(url_proton).json()
@@ -176,7 +175,7 @@ with tabs[1]:
     except:
         st.error("Could not load proton flux data.")
 
-    st.markdown("### ⚡ 5. X-Ray Flux (Solar Flares)")
+    st.markdown("### 5. X-Ray Flux (Solar Flares)")
     try:
         url_xray = "https://services.swpc.noaa.gov/json/goes/primary/xrays-3-day.json"
         xray_data = requests.get(url_xray).json()
@@ -194,7 +193,7 @@ with tabs[1]:
     except:
         st.error("Could not load X-ray data.")
 
-    st.markdown("### 🧭 6. Kp Index (Geomagnetic Activity)")
+    st.markdown("### 6. Kp Index (Geomagnetic Activity)")
     try:
         url_kp = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json"
         raw_data = requests.get(url_kp).json()
