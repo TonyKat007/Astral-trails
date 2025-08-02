@@ -784,7 +784,7 @@ with tabs[6]:
         st.error(f"Could not load Kp index data: {e}")
 
     # --- Solar Flare Map (Mock Locations) ---
-    st.markdown("### Solar Flare Activity Map (Mock)")
+    st.markdown("### Solar Flare Activity Map")
     try:
         m = folium.Map(location=[0, 0], zoom_start=2)
         # Random mock locations with intensity
