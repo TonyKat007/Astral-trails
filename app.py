@@ -124,23 +124,21 @@ with tabs[1]:
     from streamlit_folium import folium_static
     import pandas as pd
 
-    st.subheader("Real-Time Space Weather Dashboard")
-
-    st.markdown("### 1. Real-Time Solar Images")
+    st.markdown("### Real-Time Solar Images")
     col1, col2 = st.columns(2)
     with col1:
         st.image("https://services.swpc.noaa.gov/images/animations/lasco-c2/latest.jpg", 
-                 caption="SOHO LASCO C2 (Coronal Mass Ejections)", use_column_width=True)
+                 caption="SOHO LASCO C2 (Coronal Mass Ejections)", use_container_width=True)
 
     st.markdown("---")
-    st.markdown("### 2. Aurora Forecast Map")
+    st.markdown("### Aurora Forecast Map")
     st.image("https://services.swpc.noaa.gov/images/aurora-forecast-northern-hemisphere.jpg", 
-             caption="NOAA Aurora Forecast (Northern Hemisphere)", use_column_width=True)
+             caption="NOAA Aurora Forecast (Northern Hemisphere)", use_container_width=True)
     st.image("https://services.swpc.noaa.gov/images/aurora-forecast-southern-hemisphere.jpg", 
-             caption="NOAA Aurora Forecast (Southern Hemisphere)", use_column_width=True)
+             caption="NOAA Aurora Forecast (Southern Hemisphere)", use_container_width=True)
 
     st.markdown("---")
-    st.markdown("### 3. ISS Position Tracker")
+    st.markdown("### ISS Position Tracker")
     try:
         iss_data = requests.get("http://api.open-notify.org/iss-now.json").json()
         iss_lat = float(iss_data['iss_position']['latitude'])
