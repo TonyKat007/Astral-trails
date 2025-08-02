@@ -955,6 +955,6 @@ st.markdown(
     <div class="css-1q8dd3e">
       Built by the Impostor Among Us | Last updated: {date}
     </div>
-    """.format(date=datetime.now().strftime("%B %d, %Y")),
+    """.format(date=datetime.datetime.now().strftime("%B %d, %Y")),
     unsafe_allow_html=True
 )
