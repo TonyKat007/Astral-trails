@@ -131,9 +131,6 @@ with tabs[1]:
     with col1:
         st.image("https://services.swpc.noaa.gov/images/animations/lasco-c2/latest.jpg", 
                  caption="SOHO LASCO C2 (Coronal Mass Ejections)", use_column_width=True)
-    with col2:
-        st.image("https://services.swpc.noaa.gov/images/animations/suvi/primary/195/latest.jpg", 
-                 caption="SUVI 195Å Solar Corona", use_column_width=True)
 
     st.markdown("---")
     st.markdown("### 2. Aurora Forecast Map")
