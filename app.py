@@ -915,11 +915,6 @@ with tabs[8]:
                     st.markdown("### Numeric Columns Summary")
                     st.dataframe(df[numeric_cols].describe())
 
-                    # --- Missing values heatmap ---
-                    st.markdown("### Missing Values Heatmap")
-                    fig, ax = plt.subplots(figsize=(max(6, len(df.columns)//2), 2))
-                    sns.heatmap(df[numeric_cols].isnull(), cbar=False, cmap='viridis', ax=ax)
-                    st.pyplot(fig)
 
                     # --- Correlation Heatmap ---
                     st.markdown("### Correlation Heatmap")
