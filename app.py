@@ -794,6 +794,19 @@ with tabs[6]:
     except Exception as e:
         st.error(f"Could not load Kp index data: {e}")
 
+    st.markdown("---")
+
+    # --- 2️⃣ Live ISS Tracker ---
+    st.markdown("### 🛰 Live ISS Tracker")
+    st.caption("Shows the current location of the International Space Station in real-time.")
+    components.html(
+        """
+        <iframe src="https://isstracker.spaceflight.esa.int/" 
+        width="100%" height="500px" style="border:none;"></iframe>
+        """,
+        height=500,
+    )
+
     # --- Solar Flare Map (Mock Locations) ---
     st.markdown("### Solar Flare Activity Map")
     try:
