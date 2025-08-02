@@ -882,34 +882,77 @@ with tabs[7]:
 
 # Tab 9: cosmic ray data explorerwith tabs[8]:
 with tabs[8]:
-    st.subheader("📤 Upload & Analyze Your Own Cosmic Ray Dataset")
-    uploaded_file = st.file_uploader("Upload your CSV file (must include 'Energy' and 'Flux' columns, max 2MB)", type=["csv"])
+    st.subheader("📤 Universal CSV Analyzer")
+    
+    MAX_FILE_MB = 500  # Should match .streamlit/config.toml
+    uploaded_file = st.file_uploader(f"Upload any CSV file (Max {MAX_FILE_MB} MB)", type=["csv"])
+
     if uploaded_file is not None:
-        if uploaded_file.size > 2 * 1024 * 1024:
-            st.error("File too large. Please upload a file smaller than 2MB.")
+        file_size_mb = uploaded_file.size / (1024 * 1024)
+        st.info(f"Uploaded file size: **{file_size_mb:.2f} MB**")
+
+        if file_size_mb > MAX_FILE_MB:
+            st.error(f"File too large! Limit is {MAX_FILE_MB} MB.")
         else:
             try:
                 df = pd.read_csv(uploaded_file)
-                if 'Energy' in df.columns and 'Flux' in df.columns:
-                    st.success("File uploaded and read successfully!")
-                    st.markdown("### Preview of Uploaded Data")
-                    st.dataframe(df.head())
-                    log_scale = st.checkbox("Log scale", value=True)
-                    fig, ax = plt.subplots()
-                    ax.plot(df['Energy'], df['Flux'], marker='o', linestyle='-', color='blue')
-                    ax.set_xlabel("Energy")
-                    ax.set_ylabel("Flux")
-                    ax.set_title("Uploaded Cosmic Ray Spectrum")
-                    if log_scale:
-                        ax.set_yscale("log")
-                        ax.set_xscale("log")
-                    ax.grid(True, which='both', linestyle='--', alpha=0.5)
+                st.success(f"File uploaded successfully! Shape: {df.shape[0]} rows × {df.shape[1]} columns")
+
+                # --- Show basic info ---
+                st.markdown("### Preview of Data")
+                st.dataframe(df.head())
+
+                st.markdown("### Dataset Summary")
+                buffer = StringIO()
+                df.info(buf=buffer)
+                st.text(buffer.getvalue())
+
+                # --- Handle numeric columns ---
+                numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
+
+                if numeric_cols:
+                    st.markdown("### Numeric Columns Summary")
+                    st.dataframe(df[numeric_cols].describe())
+
+                    # --- Missing values heatmap ---
+                    st.markdown("### Missing Values Heatmap")
+                    fig, ax = plt.subplots(figsize=(max(6, len(df.columns)//2), 2))
+                    sns.heatmap(df[numeric_cols].isnull(), cbar=False, cmap='viridis', ax=ax)
                     st.pyplot(fig)
+
+                    # --- Correlation Heatmap ---
+                    st.markdown("### Correlation Heatmap")
+                    fig, ax = plt.subplots(figsize=(min(0.8*len(numeric_cols),12), 4))
+                    sns.heatmap(df[numeric_cols].corr(), annot=True, fmt=".2f", cmap="coolwarm", ax=ax)
+                    st.pyplot(fig)
+
+                    # --- Histogram for each numeric column ---
+                    st.markdown("### Histograms")
+                    for col in numeric_cols:
+                        fig, ax = plt.subplots()
+                        sns.histplot(df[col].dropna(), kde=True, ax=ax, color='blue')
+                        ax.set_title(f"Distribution of {col}")
+                        st.pyplot(fig)
+
+                    # --- Scatter Matrix ---
+                    st.markdown("### Scatter Matrix (First 5 Numeric Columns)")
+                    if len(numeric_cols) > 1:
+                        fig = px.scatter_matrix(df[numeric_cols[:5]])
+                        st.plotly_chart(fig, use_container_width=True)
+
+                    # --- Custom Plot ---
+                    st.markdown("### Custom Plot Builder")
+                    x_axis = st.selectbox("Select X-axis", options=["None"] + numeric_cols)
+                    y_axis = st.selectbox("Select Y-axis", options=numeric_cols)
+                    if x_axis != "None":
+                        fig = px.scatter(df, x=x_axis, y=y_axis, title=f"{y_axis} vs {x_axis}")
+                        st.plotly_chart(fig, use_container_width=True)
+                    else:
+                        st.line_chart(df[y_axis], use_container_width=True)
                 else:
-                    st.error("CSV must contain 'Energy' and 'Flux' columns.")
+                    st.warning("No numeric columns found to analyze!")
             except Exception as e:
                 st.error(f"Error reading file: {e}")
-
 
 # FOOTER
 st.markdown(f"""
