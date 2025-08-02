@@ -118,6 +118,17 @@ with tabs[0]:
 
 # ===========================================TAB 2: Live Cosmic Ray Shower Map (real-time but not live)====================================================
 with tabs[1]:
+
+    st.subheader("🌞 Live NOAA Space Weather Dashboard")
+    components.html(
+        """
+        <iframe src="https://www.swpc.noaa.gov/products/real-time-solar-wind"
+        width="100%" height="500" style="border:none;"></iframe>
+        """,
+        height=500
+    )
+
+    
     st.subheader("Live Cosmic Ray Shower Map")
     m = folium.Map(location=[0, 0], zoom_start=2)
 
