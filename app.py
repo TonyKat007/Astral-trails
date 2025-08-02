@@ -87,8 +87,8 @@ with tabs[0]:
     total_dose = daily_dose * mission_days
     risk_percent = (total_dose / 1000) * 5
 
-    st.metric("☢️ Estimated Total Dose (mSv)", f"{total_dose:.5f}")
-    st.metric("⚠️ Estimated Cancer Risk", f"{risk_percent:.5f} %")
+    st.metric("Estimated Total Dose (mSv)", f"{total_dose:.5f}")
+    st.metric("Estimated Cancer Risk", f"{risk_percent:.5f} %")
 
     st.subheader("Dose Accumulation Over Time")
     days = np.arange(1, mission_days + 1)
@@ -170,7 +170,7 @@ with tabs[1]:
     }
 
       # ====intensity filter====
-    st.markdown("### 🔍 Filter Shower Events")
+    st.markdown("#### Filter Shower Events")
     intensity_options = st.multiselect(
         "Select intensity levels to display",
         options=["Low", "Moderate", "High"],
@@ -304,7 +304,7 @@ with tabs[2]:
     except Exception as e:
         st.error(f"Could not load image: {e}\nCheck that 'images' folder exists alongside this script and contains {img_file}.")
     
-        st.subheader("📊 Interactive Risk Severity Chart")
+        st.subheader("Interactive Risk Severity Chart")
     
     thresholds = [0, 1, 5, 15, 30, 50]
     labels = ["None", "Minor", "Mild ARS", "Severe ARS", "Lethal", "Extreme/Fatal"]
@@ -551,7 +551,7 @@ with tabs[5]:  # Mission Dose Comparator Tab
     radiation_data = fetch_space_radiation_data()
 
     # ---- 2. DYNAMIC SHIELDING MODEL ----
-    st.subheader("🛡️ Shielding Configuration")
+    st.subheader("Shielding Configuration")
     col1, col2 = st.columns(2)
     with col1:
         material = st.selectbox(
@@ -577,7 +577,7 @@ with tabs[5]:  # Mission Dose Comparator Tab
 
     # ---- 3. SOLAR CYCLE ADJUSTMENT ----
     solar_phase = st.radio(
-        "☀️ Solar Activity Phase",
+        "Solar Activity Phase",
         ["Solar Max (Lowest Radiation)", "Average", "Solar Min (Highest Radiation)"],
         horizontal=True
     )
@@ -588,7 +588,7 @@ with tabs[5]:  # Mission Dose Comparator Tab
     }
 
     # ---- 4. MISSION PARAMETERS ----
-    st.subheader("🛰 Mission Profile")
+    st.subheader("Mission Profile")
     mission = st.selectbox(
         "Select Mission Profile",
         ["ISS (Low Earth Orbit)", "Lunar Orbit", "Lunar Surface", "Mars Transit", "Deep Space"],
@@ -617,7 +617,7 @@ with tabs[5]:  # Mission Dose Comparator Tab
     total_dose = adjusted_dose_rate * duration
 
     # ---- 5. ORGAN DOSE BREAKDOWN ----
-    st.subheader("🧠 Organ-Specific Radiation Exposure")
+    st.subheader("Organ-Specific Radiation Exposure")
     organs = {
         "Skin": 1.1,
         "Eyes": 1.5,
@@ -642,7 +642,7 @@ with tabs[5]:  # Mission Dose Comparator Tab
     st.plotly_chart(fig_organs, use_container_width=True)
 
     # ---- 6. HISTORICAL COMPARISON ----
-    st.subheader("📜 Comparison with Real Missions")
+    st.subheader("Comparison with Real Missions")
     historic_missions = {
         "ISS (6 months)": 80,
         "Apollo 14 (9 days)": 1.14,
