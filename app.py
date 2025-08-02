@@ -155,64 +155,8 @@ with tabs[1]:
         st.warning("Could not fetch ISS position at the moment.")
 
     st.markdown("---")
-    st.markdown("### 4. Proton Flux (≥10 MeV)")
-    try:
-        url_proton = "https://services.swpc.noaa.gov/json/goes/primary/integral-protons-3-day.json"
-        proton_data = requests.get(url_proton).json()
-        times = [datetime.datetime.strptime(p["time_tag"], "%Y-%m-%dT%H:%M:%SZ") for p in proton_data if p["energy"] == ">=10 MeV"]
-        fluxes = [float(p["flux"]) for p in proton_data if p["energy"] == ">=10 MeV"]
-
-        fig, ax = plt.subplots()
-        ax.plot(times, fluxes, color='red')
-        ax.set_title("Proton Flux (GOES - ≥10 MeV)")
-        ax.set_ylabel("Flux (protons/cm²·s·sr)")
-        ax.set_xlabel("UTC Time")
-        ax.grid(True)
-        st.pyplot(fig)
-    except:
-        st.error("Could not load proton flux data.")
-
-    st.markdown("### 5. X-Ray Flux (Solar Flares)")
-    try:
-        url_xray = "https://services.swpc.noaa.gov/json/goes/primary/xrays-3-day.json"
-        xray_data = requests.get(url_xray).json()
-        x_times = [datetime.datetime.strptime(x["time_tag"], "%Y-%m-%dT%H:%M:%SZ") for x in xray_data]
-        short_flux = [float(x["flux"]) for x in xray_data]
-
-        fig, ax = plt.subplots()
-        ax.plot(x_times, short_flux, color='orange')
-        ax.set_title("X-Ray Flux (GOES)")
-        ax.set_ylabel("Flux (W/m²)")
-        ax.set_xlabel("UTC Time")
-        ax.set_yscale("log")
-        ax.grid(True)
-        st.pyplot(fig)
-    except:
-        st.error("Could not load X-ray data.")
-
-    st.markdown("### 6. Kp Index (Geomagnetic Activity)")
-    try:
-        url_kp = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json"
-        raw_data = requests.get(url_kp).json()
-        header = raw_data[0]
-        rows = raw_data[1:]
-        df_kp = pd.DataFrame(rows, columns=header)
-        df_kp["time_tag"] = pd.to_datetime(df_kp["time_tag"])
-        df_kp["Kp"] = pd.to_numeric(df_kp["Kp"], errors='coerce')
-
-        fig, ax = plt.subplots()
-        ax.plot(df_kp["time_tag"], df_kp["Kp"], color='blue')
-        ax.set_title("Kp Index (NOAA - Last 3 Days)")
-        ax.set_ylabel("Kp Value")
-        ax.set_xlabel("UTC Time")
-        ax.grid(True)
-        st.pyplot(fig)
-    except Exception as e:
-        st.error(f"Could not load Kp index data: {e}")
-
-    st.caption("Dashboard auto-refreshes every 5 minutes. Data courtesy: NOAA SWPC & Open Notify")
-
     
+    st.caption("Dashboard auto-refreshes every 5 minutes. Data courtesy: NOAA SWPC & Open Notify")
 
     
     st.subheader("Live Cosmic Ray Shower Map")
