@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import folium
+import seaborn as sns
 import random
 from streamlit_folium import folium_static
 import plotly.graph_objects as go
