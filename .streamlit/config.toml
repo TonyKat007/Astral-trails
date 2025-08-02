@@ -1,2 +1,9 @@
 [server]
 maxUploadSize = 500
+
+[theme]
+primaryColor = "#0a192f"                  # your accent color
+backgroundColor = "#0f1624"               # main background
+secondaryBackgroundColor = "#112240"      # widget/card background
+textColor = "#e6f1ff"                     # main text
+font = "sans serif"                       # or "serif", "monospace"
