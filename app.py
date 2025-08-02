@@ -796,16 +796,16 @@ with tabs[6]:
 
     st.markdown("---")
 
-    # --- 2️⃣ Live ISS Tracker ---
-    st.markdown("### 🛰 Live ISS Tracker")
-    st.caption("Shows the current location of the International Space Station in real-time.")
-    components.html(
-        """
-        <iframe src="https://isstracker.spaceflight.esa.int/" 
-        width="100%" height="500px" style="border:none;"></iframe>
-        """,
-        height=500,
-    )
+    # --- 2️Live ISS Tracker ---
+      # --- 3️ Aurora Forecast Images from NOAA ---
+    st.markdown("### 🌌 Aurora Forecasts (NOAA SWPC)")
+    st.caption("Updated every ~5 minutes. Courtesy of NOAA Space Weather Prediction Center.")
+    
+    st.image("https://services.swpc.noaa.gov/images/aurora-forecast-northern-hemisphere.png",
+             caption="Aurora Forecast - Northern Hemisphere", use_column_width=True)
+    st.image("https://services.swpc.noaa.gov/images/aurora-forecast-southern-hemisphere.png",
+             caption="Aurora Forecast - Southern Hemisphere", use_column_width=True)
+
 
     # --- Solar Flare Map (Mock Locations) ---
     st.markdown("### Solar Flare Activity Map")
