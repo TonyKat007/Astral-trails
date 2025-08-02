@@ -119,14 +119,7 @@ with tabs[0]:
 # ===========================================TAB 2: Live Cosmic Ray Shower Map (real-time but not live)====================================================
 with tabs[1]:
 
-    st.subheader("🌞 Live NOAA Space Weather Dashboard")
-    components.html(
-        """
-        <iframe src="https://www.swpc.noaa.gov/products/real-time-solar-wind"
-        width="100%" height="500" style="border:none;"></iframe>
-        """,
-        height=500
-    )
+    
 
     
     st.subheader("Live Cosmic Ray Shower Map")
@@ -793,18 +786,6 @@ with tabs[6]:
             st.success(f"Geomagnetic field is quiet (Kp = {latest_kp})")
     except Exception as e:
         st.error(f"Could not load Kp index data: {e}")
-
-    st.markdown("---")
-
-    # --- 2️Live ISS Tracker ---
-      # --- 3️ Aurora Forecast Images from NOAA ---
-    st.markdown("### 🌌 Aurora Forecasts (NOAA SWPC)")
-    st.caption("Updated every ~5 minutes. Courtesy of NOAA Space Weather Prediction Center.")
-    
-    st.image("https://services.swpc.noaa.gov/images/aurora-forecast-northern-hemisphere.png",
-             caption="Aurora Forecast - Northern Hemisphere", use_column_width=True)
-    st.image("https://services.swpc.noaa.gov/images/aurora-forecast-southern-hemisphere.png",
-             caption="Aurora Forecast - Southern Hemisphere", use_column_width=True)
 
 
     # --- Solar Flare Map (Mock Locations) ---
