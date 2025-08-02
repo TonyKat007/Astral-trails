@@ -118,6 +118,103 @@ with tabs[0]:
 
 # ===========================================TAB 2: Live Cosmic Ray Shower Map (real-time but not live)====================================================
 with tabs[1]:
+# Tab 7: Space Weather Live
+    import datetime
+    import matplotlib.pyplot as plt
+    import folium
+    from streamlit_folium import folium_static
+    import pandas as pd
+
+    st.subheader("🌞 Real-Time Space Weather Dashboard")
+
+    st.markdown("### ☀️ 1. Real-Time Solar Images")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.image("https://services.swpc.noaa.gov/images/animations/lasco-c2/latest.jpg", 
+                 caption="SOHO LASCO C2 (Coronal Mass Ejections)", use_column_width=True)
+    with col2:
+        st.image("https://services.swpc.noaa.gov/images/animations/suvi/primary/195/latest.jpg", 
+                 caption="SUVI 195Å Solar Corona", use_column_width=True)
+
+    st.markdown("---")
+    st.markdown("### 🌌 2. Aurora Forecast Map")
+    st.image("https://services.swpc.noaa.gov/images/aurora-forecast-northern-hemisphere.jpg", 
+             caption="NOAA Aurora Forecast (Northern Hemisphere)", use_column_width=True)
+    st.image("https://services.swpc.noaa.gov/images/aurora-forecast-southern-hemisphere.jpg", 
+             caption="NOAA Aurora Forecast (Southern Hemisphere)", use_column_width=True)
+
+    st.markdown("---")
+    st.markdown("### 🛰 3. ISS Position Tracker")
+    try:
+        iss_data = requests.get("http://api.open-notify.org/iss-now.json").json()
+        iss_lat = float(iss_data['iss_position']['latitude'])
+        iss_lon = float(iss_data['iss_position']['longitude'])
+
+        m = folium.Map(location=[iss_lat, iss_lon], zoom_start=2)
+        folium.Marker([iss_lat, iss_lon], 
+                      popup=f"ISS Location: {iss_lat:.2f}, {iss_lon:.2f}",
+                      icon=folium.Icon(color="red", icon="rocket", prefix='fa')).add_to(m)
+        folium_static(m)
+    except:
+        st.warning("Could not fetch ISS position at the moment.")
+
+    st.markdown("---")
+    st.markdown("### ☢ 4. Proton Flux (≥10 MeV)")
+    try:
+        url_proton = "https://services.swpc.noaa.gov/json/goes/primary/integral-protons-3-day.json"
+        proton_data = requests.get(url_proton).json()
+        times = [datetime.datetime.strptime(p["time_tag"], "%Y-%m-%dT%H:%M:%SZ") for p in proton_data if p["energy"] == ">=10 MeV"]
+        fluxes = [float(p["flux"]) for p in proton_data if p["energy"] == ">=10 MeV"]
+
+        fig, ax = plt.subplots()
+        ax.plot(times, fluxes, color='red')
+        ax.set_title("Proton Flux (GOES - ≥10 MeV)")
+        ax.set_ylabel("Flux (protons/cm²·s·sr)")
+        ax.set_xlabel("UTC Time")
+        ax.grid(True)
+        st.pyplot(fig)
+    except:
+        st.error("Could not load proton flux data.")
+
+    st.markdown("### ⚡ 5. X-Ray Flux (Solar Flares)")
+    try:
+        url_xray = "https://services.swpc.noaa.gov/json/goes/primary/xrays-3-day.json"
+        xray_data = requests.get(url_xray).json()
+        x_times = [datetime.datetime.strptime(x["time_tag"], "%Y-%m-%dT%H:%M:%SZ") for x in xray_data]
+        short_flux = [float(x["flux"]) for x in xray_data]
+
+        fig, ax = plt.subplots()
+        ax.plot(x_times, short_flux, color='orange')
+        ax.set_title("X-Ray Flux (GOES)")
+        ax.set_ylabel("Flux (W/m²)")
+        ax.set_xlabel("UTC Time")
+        ax.set_yscale("log")
+        ax.grid(True)
+        st.pyplot(fig)
+    except:
+        st.error("Could not load X-ray data.")
+
+    st.markdown("### 🧭 6. Kp Index (Geomagnetic Activity)")
+    try:
+        url_kp = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json"
+        raw_data = requests.get(url_kp).json()
+        header = raw_data[0]
+        rows = raw_data[1:]
+        df_kp = pd.DataFrame(rows, columns=header)
+        df_kp["time_tag"] = pd.to_datetime(df_kp["time_tag"])
+        df_kp["Kp"] = pd.to_numeric(df_kp["Kp"], errors='coerce')
+
+        fig, ax = plt.subplots()
+        ax.plot(df_kp["time_tag"], df_kp["Kp"], color='blue')
+        ax.set_title("Kp Index (NOAA - Last 3 Days)")
+        ax.set_ylabel("Kp Value")
+        ax.set_xlabel("UTC Time")
+        ax.grid(True)
+        st.pyplot(fig)
+    except Exception as e:
+        st.error(f"Could not load Kp index data: {e}")
+
+    st.caption("Dashboard auto-refreshes every 5 minutes. Data courtesy: NOAA SWPC & Open Notify")
 
     
 
