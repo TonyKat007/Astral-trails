@@ -1,3 +1,9 @@
 [server]
 maxUploadSize = 500
 
+[theme]
+primaryColor="#3949AB"                  # Deep blue
+backgroundColor="#f8f9fa"               # Light grey background
+secondaryBackgroundColor="#ffffff"      # Widget/card background
+textColor="#212121"                     # Dark grey text
+font="sans serif"
