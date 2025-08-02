@@ -12,6 +12,54 @@ import plotly.graph_objects as go
 from io import StringIO
 import streamlit.components.v1 as components
 
+st.markdown("""
+<style>
+/* ---- GLOBAL ---- */
+html, body, [class*="css"] {
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* ---- TAB BUTTONS ---- */
+.stTabs [role="tablist"] button {
+    border-radius: 8px 8px 0 0;
+    margin-right: 0.3rem;
+    background-color: #e9ecef !important;
+    color: #212121 !important;
+    font-weight: 500;
+    transition: 0.3s;
+}
+.stTabs [role="tablist"] button[aria-selected="true"] {
+    background-color: #3949AB !important;
+    color: white !important;
+}
+
+/* ---- METRICS AS CARDS ---- */
+.stMetric > div {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* ---- PLOTS AS CARDS ---- */
+div[data-testid="stPlotlyChart"], .stPyplot {
+    background: white;
+    padding: 0.8rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* ---- SIDEBAR ---- */
+section[data-testid="stSidebar"] {
+    background: #f1f3f5;
+    border-right: 1px solid #dee2e6;
+}
+
+/* ---- FOOTER ---- */
+footer {visibility: hidden;}
+</style>
+""", unsafe_allow_html=True)
+
 # App configuration
 st.set_page_config(
     page_title="Cosmic Radiation Research Dashboard",
