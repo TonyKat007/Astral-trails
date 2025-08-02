@@ -12,67 +12,6 @@ import plotly.graph_objects as go
 from io import StringIO
 import streamlit.components.v1 as components
 
-# --- Load custom CSS ---
-st.markdown(
-    """
-    <style>
-      /* Import a futuristic font from Google */
-      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@300;500;700&display=swap');
-
-      /* Apply font globally */
-      html, body, [class*="css"] {
-        font-family: 'Orbitron', sans-serif !important;
-      }
-
-      /* Card-style container for each tab pane */
-      .stContainer > .block-container {
-        padding: 1rem 2rem;
-      }
-      .stTabs [role="tablist"] button {
-        filter: brightness(1.2);
-        border-radius: 0.5rem 0.5rem 0 0;
-        margin-right: 0.2rem;
-      }
-      .stTabs [role="tablist"] .css-1offfwp {
-        background-color: #112240 !important;
-        color: #e6f1ff !important;
-      }
-      .stTabs [role="tablist"] .css-1offfwp[aria-selected="true"] {
-        background: linear-gradient(90deg, #1f4068, #162447) !important;
-        box-shadow: 0px 4px 10px rgba(0,0,0,0.5);
-      }
-
-      /* Style metrics and charts */
-      .stMetric > div {
-        background: #15293c !important;
-        border-radius: 0.75rem;
-        padding: 1rem;
-        box-shadow: inset 0 0 5px rgba(255,255,255,0.1);
-      }
-
-      /* Sidebar styling */
-      .css-1d391kg {            /* Sidebar container */
-        background-image: linear-gradient(180deg, #0f1624, #112240);
-      }
-      .css-1d391kg .css-1outpf7 {  /* Sidebar headers */
-        color: #61dafb !important;
-        font-weight: 600;
-      }
-
-      /* Footer override */
-      footer {visibility: hidden;}
-      .css-1q8dd3e {  /* your custom footer below */
-        text-align: center;
-        padding: 1rem;
-        color: #8892b0;
-        font-size: 0.8rem;
-      }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-
 # App configuration
 st.set_page_config(
     page_title="Cosmic Radiation Research Dashboard",
