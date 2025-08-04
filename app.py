@@ -168,7 +168,8 @@ with tabs[1]:
         lasco_c2_frames = fetch_animation("https://services.swpc.noaa.gov/products/animations/lasco-c2.json")
     
         if lasco_c2_frames:
-            st.image(lasco_c2_frames, caption="LASCO C2 Animation", use_column_width=True)
+            st.image(lasco_c2_frames[-1], caption="LASCO C2 Latest Frame", use_column_width=True)
+
         else:
             st.warning("Could not load LASCO-C2 frames.")
         
@@ -180,7 +181,8 @@ with tabs[1]:
         lasco_c3_frames = fetch_animation("https://services.swpc.noaa.gov/products/animations/lasco-c3.json")
     
         if lasco_c3_frames:
-            st.image(lasco_c3_frames, caption="LASCO C3 Animation", use_column_width=True)
+            st.image(lasco_c3_frames[-1], caption="LASCO C3 Latest Frame", use_column_width=True)
+
         else:
             st.warning("Could not load LASCO-C3 frames.")
         
