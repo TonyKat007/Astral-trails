@@ -123,12 +123,28 @@ with tabs[1]:
     import folium
     from streamlit_folium import folium_static
     import pandas as pd
+    import requests
+    import streamlit as st
 
     st.markdown("### Real-Time Solar Images")
+
     col1, col2 = st.columns(2)
+
     with col1:
+        # Static LASCO C2 image
         st.image("https://services.swpc.noaa.gov/images/animations/lasco-c2/latest.jpg", 
-                 caption="SOHO LASCO C2 (Coronal Mass Ejections)", use_container_width=True)
+                 caption="SOHO LASCO C2 (Latest Frame)", use_container_width=True)
+
+        # LASCO C2 animation
+        st.image("https://services.swpc.noaa.gov/images/animations/lasco-c2/latest.gif", 
+                 caption="Real-Time LASCO C2 Animation", use_container_width=True)
+
+    with col2:
+        st.markdown("#### Real-Time LASCO Viewer (Optional)")
+        st.markdown("""
+        <iframe src="https://services.swpc.noaa.gov/viewer/lasco-c2"
+                width="100%" height="480" style="border:none;"></iframe>
+        """, unsafe_allow_html=True)
 
     st.markdown("---")
     st.markdown("### Aurora Forecast Map")
@@ -153,67 +169,40 @@ with tabs[1]:
         st.warning("Could not fetch ISS position at the moment.")
 
     st.markdown("---")
-    
+
     st.caption("Dashboard auto-refreshes every 5 minutes. Data courtesy: NOAA SWPC & Open Notify")
 
-    
     st.subheader("Live Cosmic Ray Shower Map")
     m = folium.Map(location=[0, 0], zoom_start=2)
 
-    # ===fetch data===
-    data_data= pd.read_csv("TimeStamp.csv")
-
-    # ===Process it===
+    data_data = pd.read_csv("TimeStamp.csv")
     data_data.replace("null", pd.NA, inplace=True)
     data_data["TimeStamp"] = pd.to_datetime(data_data["TimeStamp"])
     for col in data_data.columns:
         if col != "TimeStamp":
             data_data[col] = pd.to_numeric(data_data[col], errors="coerce")
     latest = data_data.iloc[-1]
-    latest_time = latest["TimeStamp"]    
-    station_counts= latest.drop("TimeStamp").to_dict()
+    latest_time = latest["TimeStamp"]
+    station_counts = latest.drop("TimeStamp").to_dict()
 
-    #st.write("Station counts (latest row):", station_counts)
-
-    # ===plotting points===
-    
     station_coords = {
-    "  ICRB": (28.3, -16.51),
-    "     ICRO": (27.3, -15.51),
-    "    ATHN": (37.98, 23.73),
-    "    CALM": (39.2, -3.2),
-    "    BKSN": (43.28, 42.69),
-    "    JUNG": (46.55, 7.98),
-    "   JUNG1": (45.55, 6.98),
-    "    LMKS": (49.2, 20.22),
-    "    IRK2": (52.3, 104.3),
-    "    DRBS": (50.1, 4.6),
-    "    NEWK": (39.68, -75.75),
-    "   KIEL2": (54.32, 10.13),
-    "    YKTK": (62.02, 129.7),
-    "    KERG": (-49.35, 70.25),
-    "    CALG": (51.05, -114.07),
-    "    OULU": (65.05, 25.47),
-    "    APTY": (67.57, 33.38),
-    "    TXBY": (71.58, 128.92),
-    "    FSMT": (60.02, -111.93),
-    "    INVK": (68.36, -133.72),
-    "    NAIN": (56.55, -61.68),
-    "    PWNK": (54.98, -85.43),
-    "    THUL": (76.51, -68.71),
-    "    MWSB": (-67.6, 62.88),
-    "    MWSN": (-66.6, 61.88),
-    "    SOPB": (-90.0, 0.0),
-    "    SOPO": (-85.0, 2.0),
-    "    TERA": (-66.67, 140.01),
+        "  ICRB": (28.3, -16.51), "     ICRO": (27.3, -15.51), "    ATHN": (37.98, 23.73),
+        "    CALM": (39.2, -3.2), "    BKSN": (43.28, 42.69), "    JUNG": (46.55, 7.98),
+        "   JUNG1": (45.55, 6.98), "    LMKS": (49.2, 20.22), "    IRK2": (52.3, 104.3),
+        "    DRBS": (50.1, 4.6), "    NEWK": (39.68, -75.75), "   KIEL2": (54.32, 10.13),
+        "    YKTK": (62.02, 129.7), "    KERG": (-49.35, 70.25), "    CALG": (51.05, -114.07),
+        "    OULU": (65.05, 25.47), "    APTY": (67.57, 33.38), "    TXBY": (71.58, 128.92),
+        "    FSMT": (60.02, -111.93), "    INVK": (68.36, -133.72), "    NAIN": (56.55, -61.68),
+        "    PWNK": (54.98, -85.43), "    THUL": (76.51, -68.71), "    MWSB": (-67.6, 62.88),
+        "    MWSN": (-66.6, 61.88), "    SOPB": (-90.0, 0.0), "    SOPO": (-85.0, 2.0),
+        "    TERA": (-66.67, 140.01),
     }
 
-      # ====intensity filter====
     st.markdown("#### Filter Shower Events")
     intensity_options = st.multiselect(
         "Select intensity levels to display",
         options=["Low", "Moderate", "High"],
-        default=[ ]
+        default=[]
     )
 
     def get_intensity_level(count):
@@ -221,48 +210,38 @@ with tabs[1]:
             return "No Data"
         elif count > 200:
             return "High"
-        elif count < 200 and count > 100:
+        elif count > 100:
             return "Moderate"
         else:
             return "Low"
-    # ===color based on intensity===
+
     def get_color(count):
         if count > 200:
             return 'red'
-        elif count < 200 and count > 100:
+        elif count > 100:
             return 'orange'
         else:
             return 'green'
-    
-    #===plotting on map===
+
     for station, count in station_counts.items():
         if station in station_coords and pd.notna(count):
             lat, lon = station_coords[station]
             intensity = get_intensity_level(count)
             if intensity not in intensity_options:
-                continue  # Skip this station if user has filtered it out
+                continue
 
-            if pd.isna(count):
-                color = "gray"
-            else:
-                color = {
-                        "Low": "green",
-                        "Moderate": "orange",
-                        "High": "red"
-                    }.get(intensity, "gray")
-            color = get_color(count)
             folium.CircleMarker(
                 location=[lat, lon],
                 radius=7,
-                color=color,
-                popup=f"Station: {station}\nRelative Neutron Count: {count}\nDate: \nTime: ",
+                color=get_color(count),
+                popup=f"Station: {station}\nRelative Neutron Count: {count}\nTime: {latest_time}",
                 fill=True,
                 fill_opacity=0.7
             ).add_to(m)
 
-    #===show map===
     folium_static(m)
-    st.write("We acknowledge the NMDB database www.nmdb.eu, founded under the European Union's FP7 programme (contract no. 213007) for providing data.")
+    st.write("We acknowledge the NMDB database www.nmdb.eu, funded under the EU's FP7 programme (contract no. 213007), for providing data.")
+
 
 # Tab 3: Biological Effects
 with tabs[2]:
