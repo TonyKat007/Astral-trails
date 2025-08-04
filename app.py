@@ -162,7 +162,7 @@ with tabs[1]:
     
         # Optional: Add link to original NOAA product
         st.markdown("[🔗 View full LASCO-C2 product on NOAA site](https://www.swpc.noaa.gov/products/lasco-coronagraph)")
-with col2:
+    with col2:
         st.subheader("Real-Time LASCO-C3 Animation")
     
         json_c3_url = "https://services.swpc.noaa.gov/products/animations/lasco-c3.json"
