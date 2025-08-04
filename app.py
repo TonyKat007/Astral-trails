@@ -11,6 +11,25 @@ from streamlit_folium import folium_static
 import plotly.graph_objects as go
 from io import StringIO
 import streamlit.components.v1 as components
+import requests
+import streamlit as st
+from PIL import Image
+from io import BytesIO
+def fetch_animation(json_url, max_frames=30):
+    try:
+        resp = requests.get(json_url).json()
+        frames = []
+        for item in resp.get("images", [])[:max_frames]:
+            img_url = item["url"]
+            img_data = requests.get(img_url).content
+            img = Image.open(BytesIO(img_data))
+            frames.append(img)
+        return frames
+    except Exception as e:
+        st.error(f"Error fetching animation: {e}")
+        return []
+
+
 
 # App configuration
 st.set_page_config(
@@ -130,30 +149,33 @@ with tabs[1]:
 
     col1, col2 = st.columns(2)
 
-    with col1:
-        # Static LASCO C2 image
-        st.image("https://services.swpc.noaa.gov/images/animations/lasco-c2/latest.jpg", 
-                 caption="SOHO LASCO C2 (Latest Frame)", use_container_width=True)
+   with col1:
+        st.subheader("Real-Time LASCO-C2 Animation")
     
-        # LASCO C2 animation
-        st.image("https://services.swpc.noaa.gov/images/animations/lasco-c2/latest.gif", 
-                 caption="Real-Time LASCO C2 Animation", use_container_width=True)
+        json_c2_url = "https://services.swpc.noaa.gov/products/animations/lasco-c2.json"
+        lasco_c2_frames = fetch_animation(json_c2_url, max_frames=30)
+    
+        if lasco_c2_frames:
+            st.image(lasco_c2_frames, caption="LASCO-C2 Animation (Latest Frames)", use_column_width=True)
+        else:
+            st.warning("Could not load LASCO-C2 frames.")
+    
+        # Optional: Add link to original NOAA product
+        st.markdown("[🔗 View full LASCO-C2 product on NOAA site](https://www.swpc.noaa.gov/products/lasco-coronagraph)")
+with col2:
+        st.subheader("Real-Time LASCO-C3 Animation")
+    
+        json_c3_url = "https://services.swpc.noaa.gov/products/animations/lasco-c3.json"
+        lasco_c3_frames = fetch_animation(json_c3_url, max_frames=30)
+    
+        if lasco_c3_frames:
+            st.image(lasco_c3_frames, caption="LASCO-C3 Animation (Latest Frames)", use_column_width=True)
+        else:
+            st.warning("Could not load LASCO-C3 frames.")
+    
+        st.markdown("[🔗 View full LASCO-C3 product on NOAA site](https://www.swpc.noaa.gov/products/lasco-coronagraph)")
 
-    with col2:
-        st.markdown("#### Full Viewer Link")
-        st.markdown("""
-        The interactive LASCO viewer is not embeddable, but you can view it directly [on NOAA SWPC's website](https://www.swpc.noaa.gov/products/lasco-coronagraph).
-        """)
 
-    st.markdown("---")
-    st.markdown("### Aurora Forecast Map")
-    st.image("https://services.swpc.noaa.gov/images/aurora-forecast-northern-hemisphere.jpg", 
-             caption="NOAA Aurora Forecast (Northern Hemisphere)", use_container_width=True)
-    st.image("https://services.swpc.noaa.gov/images/aurora-forecast-southern-hemisphere.jpg", 
-             caption="NOAA Aurora Forecast (Southern Hemisphere)", use_container_width=True)
-
-    st.markdown("---")
-    st.markdown("### ISS Position Tracker")
     try:
         iss_data = requests.get("http://api.open-notify.org/iss-now.json").json()
         iss_lat = float(iss_data['iss_position']['latitude'])
