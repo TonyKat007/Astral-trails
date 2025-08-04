@@ -17,10 +17,9 @@ from PIL import Image
 from io import BytesIO
 def fetch_animation(json_url, max_frames=30):
     try:
-        resp = requests.get(json_url).json()
+        resp = requests.get(json_url).json()   # This returns a list of URLs
         frames = []
-        for item in resp.get("images", [])[:max_frames]:
-            img_url = item["url"]
+        for img_url in resp[:max_frames]:
             img_data = requests.get(img_url).content
             img = Image.open(BytesIO(img_data))
             frames.append(img)
