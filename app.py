@@ -17,16 +17,17 @@ from PIL import Image
 from io import BytesIO
 def fetch_animation(json_url, max_frames=30):
     try:
-        resp = requests.get(json_url).json()   # This returns a list of URLs
+        resp = requests.get(json_url).json()   # It's a list of URLs
         frames = []
         for img_url in resp[:max_frames]:
             img_data = requests.get(img_url).content
-            img = Image.open(BytesIO(img_data))
+            img = Image.open(BytesIO(img_data)).convert("RGB")
             frames.append(img)
         return frames
     except Exception as e:
         st.error(f"Error fetching animation: {e}")
         return []
+
 
 
 
@@ -149,31 +150,30 @@ with tabs[1]:
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("Real-Time LASCO-C2 Animation")
+        st.header("Real-Time LASCO-C2 Animation")
     
-        json_c2_url = "https://services.swpc.noaa.gov/products/animations/lasco-c2.json"
-        lasco_c2_frames = fetch_animation(json_c2_url, max_frames=30)
+        lasco_c2_frames = fetch_animation("https://services.swpc.noaa.gov/products/animations/lasco-c2.json")
     
         if lasco_c2_frames:
-            st.image(lasco_c2_frames, caption="LASCO-C2 Animation (Latest Frames)", use_column_width=True)
+            st.image(lasco_c2_frames, caption="LASCO C2 Animation", use_column_width=True)
         else:
             st.warning("Could not load LASCO-C2 frames.")
+        
+        st.markdown("[🔗 View full LASCO-C2 product on NOAA site](https://services.swpc.noaa.gov/products/animations/lasco-c2/)")
     
-        # Optional: Add link to original NOAA product
-        st.markdown("[🔗 View full LASCO-C2 product on NOAA site](https://www.swpc.noaa.gov/products/lasco-coronagraph)")
     with col2:
-        st.subheader("Real-Time LASCO-C3 Animation")
+        st.header("Real-Time LASCO-C3 Animation")
     
-        json_c3_url = "https://services.swpc.noaa.gov/products/animations/lasco-c3.json"
-        lasco_c3_frames = fetch_animation(json_c3_url, max_frames=30)
+        lasco_c3_frames = fetch_animation("https://services.swpc.noaa.gov/products/animations/lasco-c3.json")
     
         if lasco_c3_frames:
-            st.image(lasco_c3_frames, caption="LASCO-C3 Animation (Latest Frames)", use_column_width=True)
+            st.image(lasco_c3_frames, caption="LASCO C3 Animation", use_column_width=True)
         else:
             st.warning("Could not load LASCO-C3 frames.")
-    
-        st.markdown("[🔗 View full LASCO-C3 product on NOAA site](https://www.swpc.noaa.gov/products/lasco-coronagraph)")
+        
+        st.markdown("[🔗 View full LASCO-C3 product on NOAA site](https://services.swpc.noaa.gov/products/animations/lasco-c3/)")
 
+        
 
     try:
         iss_data = requests.get("http://api.open-notify.org/iss-now.json").json()
