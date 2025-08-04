@@ -17,16 +17,29 @@ from PIL import Image
 from io import BytesIO
 def fetch_animation(json_url, max_frames=30):
     try:
-        resp = requests.get(json_url).json()   # It's a list of URLs
+        resp = requests.get(json_url).json()   # It's a list of dicts with 'url'
         frames = []
-        for img_url in resp[:max_frames]:
+        base_url = "https://services.swpc.noaa.gov"
+        
+        for img_info in resp[:max_frames]:
+            # Some entries might be dict, some might be direct string
+            if isinstance(img_info, dict) and 'url' in img_info:
+                img_url = base_url + img_info['url']
+            elif isinstance(img_info, str):
+                img_url = img_info
+            else:
+                continue
+
             img_data = requests.get(img_url).content
             img = Image.open(BytesIO(img_data)).convert("RGB")
             frames.append(img)
+        
         return frames
+
     except Exception as e:
         st.error(f"Error fetching animation: {e}")
         return []
+
 
 
 
