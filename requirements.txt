@@ -10,3 +10,4 @@ plotly
 datetime
 fpdf
 seaborn
+stream_autorefresh
