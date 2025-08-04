@@ -131,13 +131,13 @@ with tabs[1]:
     col1, col2 = st.columns(2)
 
     with col1:
-    # Static LASCO C2 image
-    st.image("https://services.swpc.noaa.gov/images/animations/lasco-c2/latest.jpg", 
-             caption="SOHO LASCO C2 (Latest Frame)", use_container_width=True)
-
-    # LASCO C2 animation
-    st.image("https://services.swpc.noaa.gov/images/animations/lasco-c2/latest.gif", 
-             caption="Real-Time LASCO C2 Animation", use_container_width=True)
+        # Static LASCO C2 image
+        st.image("https://services.swpc.noaa.gov/images/animations/lasco-c2/latest.jpg", 
+                 caption="SOHO LASCO C2 (Latest Frame)", use_container_width=True)
+    
+        # LASCO C2 animation
+        st.image("https://services.swpc.noaa.gov/images/animations/lasco-c2/latest.gif", 
+                 caption="Real-Time LASCO C2 Animation", use_container_width=True)
 
     with col2:
         st.markdown("#### Full Viewer Link")
