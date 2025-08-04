@@ -149,7 +149,7 @@ with tabs[1]:
 
     col1, col2 = st.columns(2)
 
-   with col1:
+    with col1:
         st.subheader("Real-Time LASCO-C2 Animation")
     
         json_c2_url = "https://services.swpc.noaa.gov/products/animations/lasco-c2.json"
