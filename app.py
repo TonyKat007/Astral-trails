@@ -131,20 +131,19 @@ with tabs[1]:
     col1, col2 = st.columns(2)
 
     with col1:
-        # Static LASCO C2 image
-        st.image("https://services.swpc.noaa.gov/images/animations/lasco-c2/latest.jpg", 
-                 caption="SOHO LASCO C2 (Latest Frame)", use_container_width=True)
+    # Static LASCO C2 image
+    st.image("https://services.swpc.noaa.gov/images/animations/lasco-c2/latest.jpg", 
+             caption="SOHO LASCO C2 (Latest Frame)", use_container_width=True)
 
-        # LASCO C2 animation
-        st.image("https://services.swpc.noaa.gov/images/animations/lasco-c2/latest.gif", 
-                 caption="Real-Time LASCO C2 Animation", use_container_width=True)
+    # LASCO C2 animation
+    st.image("https://services.swpc.noaa.gov/images/animations/lasco-c2/latest.gif", 
+             caption="Real-Time LASCO C2 Animation", use_container_width=True)
 
     with col2:
-        st.markdown("#### Real-Time LASCO Viewer (Optional)")
+        st.markdown("#### Full Viewer Link")
         st.markdown("""
-        <iframe src="https://services.swpc.noaa.gov/viewer/lasco-c2"
-                width="100%" height="480" style="border:none;"></iframe>
-        """, unsafe_allow_html=True)
+        The interactive LASCO viewer is not embeddable, but you can view it directly [on NOAA SWPC's website](https://www.swpc.noaa.gov/products/lasco-coronagraph).
+        """)
 
     st.markdown("---")
     st.markdown("### Aurora Forecast Map")
