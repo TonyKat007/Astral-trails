@@ -16,30 +16,7 @@ import streamlit as st
 from PIL import Image
 from io import BytesIO
 import streamlit_autorefresh
-def fetch_animation(json_url, max_frames=30):
-    try:
-        resp = requests.get(json_url).json()   # It's a list of dicts with 'url'
-        frames = []
-        base_url = "https://services.swpc.noaa.gov"
-        
-        for img_info in resp[:max_frames]:
-            # Some entries might be dict, some might be direct string
-            if isinstance(img_info, dict) and 'url' in img_info:
-                img_url = base_url + img_info['url']
-            elif isinstance(img_info, str):
-                img_url = img_info
-            else:
-                continue
 
-            img_data = requests.get(img_url).content
-            img = Image.open(BytesIO(img_data)).convert("RGB")
-            frames.append(img)
-        
-        return frames
-
-    except Exception as e:
-        st.error(f"Error fetching animation: {e}")
-        return []
 
 
 
@@ -151,54 +128,78 @@ with tabs[0]:
 
 # ===========================================TAB 2: Live Cosmic Ray Shower Map (real-time but not live)====================================================
 with tabs[1]:
-    import datetime
-    import matplotlib.pyplot as plt
-    import folium
-    from streamlit_folium import folium_static
-    import pandas as pd
-    import requests
     import streamlit as st
-    streamlit_autorefresh.st_autorefresh(interval=300000, key="autoRefresh")
+    import requests
+    from io import BytesIO
+    from PIL import Image
 
-    st.markdown("### Real-Time Solar Images")
-    def fetch_animation(url):
+    st.markdown("## Real-Time Solar Images")
+
+    # Optional autorefresh
+    from streamlit_autorefresh import st_autorefresh
+    st_autorefresh(interval=300000, key="autoRefresh")  # every 5 min
+
+    # Function to fetch animation frames
+    def fetch_animation(json_url):
         try:
-            response = requests.get(url)
+            response = requests.get(json_url)
             response.raise_for_status()
             data = response.json()
             frame_urls = data.get("frames", [])
-    
-            if isinstance(frame_urls, list):
-                return [Image.open(BytesIO(requests.get(frame.get("url")).content)) for frame in frame_urls]
-            else:
-                return []
+
+            # Build list of images
+            images = []
+            for frame in frame_urls:
+                image_url = frame.get("url")
+                if image_url:
+                    # NOAA gives relative URL → make it absolute if needed
+                    if image_url.startswith("/"):
+                        image_url = "https://services.swpc.noaa.gov" + image_url
+                    img_resp = requests.get(image_url)
+                    img_resp.raise_for_status()
+                    img = Image.open(BytesIO(img_resp.content))
+                    images.append(img)
+            return images
+
         except Exception as e:
             st.error(f"Error fetching animation: {e}")
             return []
 
-
+    # Layout columns
     col1, col2 = st.columns(2)
 
+    # LASCO-C2
     with col1:
         st.header("Real-Time LASCO-C2 Animation")
+
         lasco_c2_frames = fetch_animation("https://services.swpc.noaa.gov/products/animations/lasco-c2.json")
-    
+
         if lasco_c2_frames:
-            st.image(lasco_c2_frames[-1], caption="LASCO C2 Latest Frame", use_container_width=True)
+            st.image(
+                lasco_c2_frames,
+                caption=[f"Frame {i+1}" for i in range(len(lasco_c2_frames))],
+                use_container_width=True
+            )
         else:
             st.warning("Could not load LASCO-C2 frames.")
-    
+
         st.markdown("[🔗 View full LASCO-C2 product on NOAA site](https://services.swpc.noaa.gov/products/animations/lasco-c2/)")
-    
+
+    # LASCO-C3
     with col2:
         st.header("Real-Time LASCO-C3 Animation")
+
         lasco_c3_frames = fetch_animation("https://services.swpc.noaa.gov/products/animations/lasco-c3.json")
-    
+
         if lasco_c3_frames:
-            st.image(lasco_c3_frames[-1], caption="LASCO C3 Latest Frame", use_container_width=True)
+            st.image(
+                lasco_c3_frames,
+                caption=[f"Frame {i+1}" for i in range(len(lasco_c3_frames))],
+                use_container_width=True
+            )
         else:
             st.warning("Could not load LASCO-C3 frames.")
-    
+
         st.markdown("[🔗 View full LASCO-C3 product on NOAA site](https://services.swpc.noaa.gov/products/animations/lasco-c3/)")
     
         
