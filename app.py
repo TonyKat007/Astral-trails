@@ -131,9 +131,12 @@ with tabs[1]:
     from io import BytesIO
     from streamlit_autorefresh import st_autorefresh
 
-    st.markdown("## Real-Time Solar Images")
-    st_autorefresh(interval=300000, key="autoRefresh")  # every 5 minutes
+    # === Auto-refresh every 5 minutes ===
+    st_autorefresh(interval=300000, key="autoRefresh")
 
+    st.markdown("## ☀️ Real-Time Solar Images")
+
+    # === Animation frame fetcher ===
     @st.cache_data(show_spinner=False)
     def fetch_animation(json_url):
         try:
@@ -141,65 +144,81 @@ with tabs[1]:
             response.raise_for_status()
             data = response.json()
             frame_urls = data.get("frames", [])
-
             images = []
+
             for frame in frame_urls:
                 image_url = frame.get("url")
-                if image_url and image_url.startswith("/"):
-                    image_url = "https://services.swpc.noaa.gov" + image_url
-                img_resp = requests.get(image_url)
-                img_resp.raise_for_status()
-                img = Image.open(BytesIO(img_resp.content))
-                images.append(img)
+                if image_url:
+                    if image_url.startswith("/"):
+                        image_url = "https://services.swpc.noaa.gov" + image_url
+                    img_resp = requests.get(image_url)
+                    img_resp.raise_for_status()
+                    img = Image.open(BytesIO(img_resp.content))
+                    images.append(img)
             return images
         except Exception as e:
             st.error(f"Error fetching animation: {e}")
             return []
 
+    # === Layout for LASCO Animations ===
     col1, col2 = st.columns(2)
 
     with col1:
-        st.header("Real-Time LASCO-C2 Animation")
+        st.subheader("🔴 LASCO-C2")
         lasco_c2_frames = fetch_animation("https://services.swpc.noaa.gov/products/animations/lasco-c2.json")
         if lasco_c2_frames:
-            st.image(lasco_c2_frames, caption=[f"Frame {i+1}" for i in range(len(lasco_c2_frames))], use_container_width=True)
+            st.image(
+                lasco_c2_frames,
+                caption=[f"Frame {i+1}" for i in range(len(lasco_c2_frames))],
+                use_container_width=True
+            )
         else:
             st.warning("Could not load LASCO-C2 frames.")
         st.markdown("[🔗 View full LASCO-C2 product](https://services.swpc.noaa.gov/products/animations/lasco-c2/)")
 
     with col2:
-        st.header("Real-Time LASCO-C3 Animation")
+        st.subheader("🔵 LASCO-C3")
         lasco_c3_frames = fetch_animation("https://services.swpc.noaa.gov/products/animations/lasco-c3.json")
         if lasco_c3_frames:
-            st.image(lasco_c3_frames, caption=[f"Frame {i+1}" for i in range(len(lasco_c3_frames))], use_container_width=True)
+            st.image(
+                lasco_c3_frames,
+                caption=[f"Frame {i+1}" for i in range(len(lasco_c3_frames))],
+                use_container_width=True
+            )
         else:
             st.warning("Could not load LASCO-C3 frames.")
         st.markdown("[🔗 View full LASCO-C3 product](https://services.swpc.noaa.gov/products/animations/lasco-c3/)")
 
-    # === ISS LOCATION MAP ===
+    st.markdown("---")
+
+    # === ISS Location Tracker ===
+    st.subheader("🛰️ International Space Station (ISS) Live Position")
     try:
         iss_data = requests.get("http://api.open-notify.org/iss-now.json").json()
         iss_lat = float(iss_data['iss_position']['latitude'])
         iss_lon = float(iss_data['iss_position']['longitude'])
 
         m = folium.Map(location=[iss_lat, iss_lon], zoom_start=2)
-        folium.Marker([iss_lat, iss_lon],
-                      popup=f"ISS Location: {iss_lat:.2f}, {iss_lon:.2f}",
-                      icon=folium.Icon(color="red", icon="rocket", prefix='fa')).add_to(m)
+        folium.Marker(
+            [iss_lat, iss_lon],
+            popup=f"ISS Location: {iss_lat:.2f}, {iss_lon:.2f}",
+            icon=folium.Icon(color="red", icon="rocket", prefix='fa')
+        ).add_to(m)
         folium_static(m)
     except Exception:
         st.warning("Could not fetch ISS position at the moment.")
 
     st.markdown("---")
-    st.caption("Dashboard auto-refreshes every 5 minutes. Data courtesy: NOAA SWPC & Open Notify")
+    st.caption("🔁 Dashboard auto-refreshes every 5 minutes. Data: NOAA SWPC & Open Notify")
 
-    # === COSMIC RAY MAP ===
-    st.subheader("Live Cosmic Ray Shower Map")
+    # === Cosmic Ray Shower Map ===
+    st.subheader("🌌 Live Cosmic Ray Shower Map")
 
     try:
         data_data = pd.read_csv("TimeStamp.csv")
         data_data.replace("null", pd.NA, inplace=True)
         data_data["TimeStamp"] = pd.to_datetime(data_data["TimeStamp"])
+
         for col in data_data.columns:
             if col != "TimeStamp":
                 data_data[col] = pd.to_numeric(data_data[col], errors="coerce")
@@ -221,9 +240,9 @@ with tabs[1]:
             "    TERA": (-66.67, 140.01),
         }
 
-        st.markdown("#### Filter Shower Events")
+        st.markdown("#### 🎯 Filter by Event Intensity")
         intensity_options = st.multiselect(
-            "Select intensity levels to display",
+            "Select intensity levels to display:",
             options=["Low", "Moderate", "High"],
             default=["High", "Moderate"]
         )
@@ -268,7 +287,7 @@ with tabs[1]:
     except FileNotFoundError:
         st.error("⚠️ 'TimeStamp.csv' not found. Please upload the data file.")
     except Exception as e:
-        st.error(f"An error occurred while processing cosmic ray data: {e}")
+        st.error(f"Error processing cosmic ray data: {e}")
 
 # Tab 3: Biological Effects
 with tabs[2]:
