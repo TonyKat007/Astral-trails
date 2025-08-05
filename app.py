@@ -138,14 +138,14 @@ with tabs[1]:
 
     # === Animation frame fetcher ===
     @st.cache_data(show_spinner=False)
+    @st.cache_data(show_spinner=False)
     def fetch_animation(json_url):
         try:
             response = requests.get(json_url)
             response.raise_for_status()
-            data = response.json()
-            frame_urls = data.get("frames", [])
+            frame_urls = response.json()  # this is a list, not a dict
+    
             images = []
-
             for frame in frame_urls:
                 image_url = frame.get("url")
                 if image_url:
@@ -156,9 +156,11 @@ with tabs[1]:
                     img = Image.open(BytesIO(img_resp.content))
                     images.append(img)
             return images
+    
         except Exception as e:
             st.error(f"Error fetching animation: {e}")
             return []
+
 
     # === Layout for LASCO Animations ===
     col1, col2 = st.columns(2)
