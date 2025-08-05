@@ -162,36 +162,37 @@ with tabs[1]:
             return []
 
 
-    # === Layout for LASCO Animations ===
+    
+    # === Layout for LASCO Latest Frames ===
     col1, col2 = st.columns(2)
-
+    
     with col1:
-        st.subheader("🔴 LASCO-C2")
+        st.subheader("🔴 LASCO-C2 (Latest Frame)")
         lasco_c2_frames = fetch_animation("https://services.swpc.noaa.gov/products/animations/lasco-c2.json")
         if lasco_c2_frames:
             st.image(
-                lasco_c2_frames,
-                caption=[f"Frame {i+1}" for i in range(len(lasco_c2_frames))],
+                lasco_c2_frames[-1],  # show only the latest
+                caption="Latest LASCO-C2 Frame",
                 use_container_width=True
             )
         else:
             st.warning("Could not load LASCO-C2 frames.")
         st.markdown("[🔗 View full LASCO-C2 product](https://services.swpc.noaa.gov/products/animations/lasco-c2/)")
-
+    
     with col2:
-        st.subheader("🔵 LASCO-C3")
+        st.subheader("🔵 LASCO-C3 (Latest Frame)")
         lasco_c3_frames = fetch_animation("https://services.swpc.noaa.gov/products/animations/lasco-c3.json")
         if lasco_c3_frames:
             st.image(
-                lasco_c3_frames,
-                caption=[f"Frame {i+1}" for i in range(len(lasco_c3_frames))],
+                lasco_c3_frames[-1],  # show only the latest
+                caption="Latest LASCO-C3 Frame",
                 use_container_width=True
             )
         else:
             st.warning("Could not load LASCO-C3 frames.")
         st.markdown("[🔗 View full LASCO-C3 product](https://services.swpc.noaa.gov/products/animations/lasco-c3/)")
-
-    st.markdown("---")
+    
+        st.markdown("---")
 
 
 
