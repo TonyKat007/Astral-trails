@@ -123,79 +123,77 @@ with tabs[0]:
 # ===========================================TAB 2: Live Cosmic Ray Shower Map (real-time but not live)====================================================
 with tabs[1]:
     import streamlit as st
+    import pandas as pd
     import requests
+    import folium
+    from streamlit_folium import folium_static
+    from PIL import Image
+    from io import BytesIO
     from streamlit_autorefresh import st_autorefresh
-    import streamlit.components.v1 as components
 
     # === Auto-refresh every 5 minutes ===
     st_autorefresh(interval=300000, key="autoRefresh")
-    st.markdown("## ☀️ Real-Time Solar Timelapse")
 
-    # === Frame URL Fetcher ===
+    st.markdown("## ☀️ Real-Time Solar Images")
+
+    # === Animation frame fetcher ===
     @st.cache_data(show_spinner=False)
-    def fetch_frame_urls(json_url):
+    @st.cache_data(show_spinner=False)
+    def fetch_animation(json_url):
         try:
             response = requests.get(json_url)
             response.raise_for_status()
-            data = response.json()
-            frames = data if isinstance(data, list) else data.get("frames", [])
-            urls = []
-            for frame in frames:
-                url = frame.get("url")
-                if url:
-                    if url.startswith("/"):
-                        url = "https://services.swpc.noaa.gov" + url
-                    urls.append(url)
-            return urls
+            frame_urls = response.json()  # this is a list, not a dict
+    
+            images = []
+            for frame in frame_urls:
+                image_url = frame.get("url")
+                if image_url:
+                    if image_url.startswith("/"):
+                        image_url = "https://services.swpc.noaa.gov" + image_url
+                    img_resp = requests.get(image_url)
+                    img_resp.raise_for_status()
+                    img = Image.open(BytesIO(img_resp.content))
+                    images.append(img)
+            return images
+    
         except Exception as e:
             st.error(f"Error fetching animation: {e}")
             return []
 
-    # === Timelapse Renderer ===
-    def render_timelapse(image_urls, title, width=512, height=512, speed_ms=300):
-        if not image_urls:
-            st.warning(f"No frames for {title}")
-            return
-    
-        title_id = title.replace(" ", "_")  # safe HTML element ID
-        urls_js = str(image_urls).replace("'", '"')  # convert Python list to JS array safely
-    
-        html = f"""
-        <div style="text-align: center;">
-            <h4 style="color:white;">{title}</h4>
-            <img id="timelapse_{title_id}" width="{width}" height="{height}" style="border-radius:10px;" />
-        </div>
-        <script>
-            const urls = {urls_js};
-            let index = 0;
-            const img = document.getElementById("timelapse_{title_id}");
-            function updateImage() {{
-                img.src = urls[index];
-                index = (index + 1) % urls.length;
-            }}
-            updateImage();
-            setInterval(updateImage, {speed_ms});
-        </script>
-        ""
-        components.html(html, height=height + 80)
 
-     # === LASCO-C2 and C3 Columns ===
+    # === Layout for LASCO Animations ===
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("🔴 LASCO-C2 Timelapse")
-        lasco_c2_urls = fetch_frame_urls("https://services.swpc.noaa.gov/products/animations/lasco-c2.json")
-        render_timelapse(lasco_c2_urls, "LASCO-C2", width=512, height=512)
+        st.subheader("🔴 LASCO-C2")
+        lasco_c2_frames = fetch_animation("https://services.swpc.noaa.gov/products/animations/lasco-c2.json")
+        if lasco_c2_frames:
+            st.image(
+                lasco_c2_frames,
+                caption=[f"Frame {i+1}" for i in range(len(lasco_c2_frames))],
+                use_container_width=True
+            )
+        else:
+            st.warning("Could not load LASCO-C2 frames.")
         st.markdown("[🔗 View full LASCO-C2 product](https://services.swpc.noaa.gov/products/animations/lasco-c2/)")
 
     with col2:
-        st.subheader("🔵 LASCO-C3 Timelapse")
-        lasco_c3_urls = fetch_frame_urls("https://services.swpc.noaa.gov/products/animations/lasco-c3.json")
-        render_timelapse(lasco_c3_urls, "LASCO-C3", width=512, height=512)
+        st.subheader("🔵 LASCO-C3")
+        lasco_c3_frames = fetch_animation("https://services.swpc.noaa.gov/products/animations/lasco-c3.json")
+        if lasco_c3_frames:
+            st.image(
+                lasco_c3_frames,
+                caption=[f"Frame {i+1}" for i in range(len(lasco_c3_frames))],
+                use_container_width=True
+            )
+        else:
+            st.warning("Could not load LASCO-C3 frames.")
         st.markdown("[🔗 View full LASCO-C3 product](https://services.swpc.noaa.gov/products/animations/lasco-c3/)")
 
     st.markdown("---")
-    st.caption("Data courtesy: NOAA SWPC | Updates every 5 minutes.")
+
+
 
 
     # === ISS Location Tracker ===
