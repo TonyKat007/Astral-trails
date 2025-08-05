@@ -16,12 +16,6 @@ import streamlit as st
 from PIL import Image
 from io import BytesIO
 import streamlit_autorefresh
-
-
-
-
-
-
 # App configuration
 st.set_page_config(
     page_title="Cosmic Radiation Research Dashboard",
@@ -128,10 +122,7 @@ with tabs[0]:
 
 # ===========================================TAB 2: Live Cosmic Ray Shower Map (real-time but not live)====================================================
 with tabs[1]:
-    import streamlit as st
-    import requests
-    from io import BytesIO
-    from PIL import Image
+    
 
     st.markdown("## Real-Time Solar Images")
 
