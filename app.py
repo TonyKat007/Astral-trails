@@ -134,7 +134,7 @@ with tabs[1]:
     # === Auto-refresh every 5 minutes ===
     st_autorefresh(interval=300000, key="autoRefresh")
 
-    st.markdown("## ☀️ Real-Time Solar Images")
+    st.markdown("## Real-Time Solar Images")
 
     # === Animation frame fetcher ===
     @st.cache_data(show_spinner=False)
@@ -167,7 +167,7 @@ with tabs[1]:
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("🔴 LASCO-C2 (Latest Frame)")
+        st.subheader("LASCO-C2 (Latest Frame)")
         lasco_c2_frames = fetch_animation("https://services.swpc.noaa.gov/products/animations/lasco-c2.json")
         if lasco_c2_frames:
             st.image(
@@ -180,7 +180,7 @@ with tabs[1]:
         st.markdown("[🔗 View full LASCO-C2 product](https://services.swpc.noaa.gov/products/animations/lasco-c2/)")
     
     with col2:
-        st.subheader("🔵 LASCO-C3 (Latest Frame)")
+        st.subheader("LASCO-C3 (Latest Frame)")
         lasco_c3_frames = fetch_animation("https://services.swpc.noaa.gov/products/animations/lasco-c3.json")
         if lasco_c3_frames:
             st.image(
@@ -198,7 +198,7 @@ with tabs[1]:
 
 
     # === ISS Location Tracker ===
-    st.subheader("🛰️ International Space Station (ISS) Live Position")
+    st.subheader("International Space Station (ISS) Live Position")
     try:
         iss_data = requests.get("http://api.open-notify.org/iss-now.json").json()
         iss_lat = float(iss_data['iss_position']['latitude'])
@@ -215,10 +215,10 @@ with tabs[1]:
         st.warning("Could not fetch ISS position at the moment.")
 
     st.markdown("---")
-    st.caption("🔁 Dashboard auto-refreshes every 5 minutes. Data: NOAA SWPC & Open Notify")
+    st.caption("Dashboard auto-refreshes every 5 minutes. Data: NOAA SWPC & Open Notify")
 
     # === Cosmic Ray Shower Map ===
-    st.subheader("🌌 Live Cosmic Ray Shower Map")
+    st.subheader("Live Cosmic Ray Shower Map")
 
     try:
         data_data = pd.read_csv("TimeStamp.csv")
