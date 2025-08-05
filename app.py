@@ -122,15 +122,19 @@ with tabs[0]:
 
 # ===========================================TAB 2: Live Cosmic Ray Shower Map (real-time but not live)====================================================
 with tabs[1]:
-    
+    import streamlit as st
+    import pandas as pd
+    import requests
+    import folium
+    from streamlit_folium import folium_static
+    from PIL import Image
+    from io import BytesIO
+    from streamlit_autorefresh import st_autorefresh
 
     st.markdown("## Real-Time Solar Images")
+    st_autorefresh(interval=300000, key="autoRefresh")  # every 5 minutes
 
-    # Optional autorefresh
-    from streamlit_autorefresh import st_autorefresh
-    st_autorefresh(interval=300000, key="autoRefresh")  # every 5 min
-
-    # Function to fetch animation frames
+    @st.cache_data(show_spinner=False)
     def fetch_animation(json_url):
         try:
             response = requests.get(json_url)
@@ -138,150 +142,133 @@ with tabs[1]:
             data = response.json()
             frame_urls = data.get("frames", [])
 
-            # Build list of images
             images = []
             for frame in frame_urls:
                 image_url = frame.get("url")
-                if image_url:
-                    # NOAA gives relative URL → make it absolute if needed
-                    if image_url.startswith("/"):
-                        image_url = "https://services.swpc.noaa.gov" + image_url
-                    img_resp = requests.get(image_url)
-                    img_resp.raise_for_status()
-                    img = Image.open(BytesIO(img_resp.content))
-                    images.append(img)
+                if image_url and image_url.startswith("/"):
+                    image_url = "https://services.swpc.noaa.gov" + image_url
+                img_resp = requests.get(image_url)
+                img_resp.raise_for_status()
+                img = Image.open(BytesIO(img_resp.content))
+                images.append(img)
             return images
-
         except Exception as e:
             st.error(f"Error fetching animation: {e}")
             return []
 
-    # Layout columns
     col1, col2 = st.columns(2)
 
-    # LASCO-C2
     with col1:
         st.header("Real-Time LASCO-C2 Animation")
-
         lasco_c2_frames = fetch_animation("https://services.swpc.noaa.gov/products/animations/lasco-c2.json")
-
         if lasco_c2_frames:
-            st.image(
-                lasco_c2_frames,
-                caption=[f"Frame {i+1}" for i in range(len(lasco_c2_frames))],
-                use_container_width=True
-            )
+            st.image(lasco_c2_frames, caption=[f"Frame {i+1}" for i in range(len(lasco_c2_frames))], use_container_width=True)
         else:
             st.warning("Could not load LASCO-C2 frames.")
+        st.markdown("[🔗 View full LASCO-C2 product](https://services.swpc.noaa.gov/products/animations/lasco-c2/)")
 
-        st.markdown("[🔗 View full LASCO-C2 product on NOAA site](https://services.swpc.noaa.gov/products/animations/lasco-c2/)")
-
-    # LASCO-C3
     with col2:
         st.header("Real-Time LASCO-C3 Animation")
-
         lasco_c3_frames = fetch_animation("https://services.swpc.noaa.gov/products/animations/lasco-c3.json")
-
         if lasco_c3_frames:
-            st.image(
-                lasco_c3_frames,
-                caption=[f"Frame {i+1}" for i in range(len(lasco_c3_frames))],
-                use_container_width=True
-            )
+            st.image(lasco_c3_frames, caption=[f"Frame {i+1}" for i in range(len(lasco_c3_frames))], use_container_width=True)
         else:
             st.warning("Could not load LASCO-C3 frames.")
+        st.markdown("[🔗 View full LASCO-C3 product](https://services.swpc.noaa.gov/products/animations/lasco-c3/)")
 
-        st.markdown("[🔗 View full LASCO-C3 product on NOAA site](https://services.swpc.noaa.gov/products/animations/lasco-c3/)")
-    
-        
-
+    # === ISS LOCATION MAP ===
     try:
         iss_data = requests.get("http://api.open-notify.org/iss-now.json").json()
         iss_lat = float(iss_data['iss_position']['latitude'])
         iss_lon = float(iss_data['iss_position']['longitude'])
 
         m = folium.Map(location=[iss_lat, iss_lon], zoom_start=2)
-        folium.Marker([iss_lat, iss_lon], 
+        folium.Marker([iss_lat, iss_lon],
                       popup=f"ISS Location: {iss_lat:.2f}, {iss_lon:.2f}",
                       icon=folium.Icon(color="red", icon="rocket", prefix='fa')).add_to(m)
         folium_static(m)
-    except:
+    except Exception:
         st.warning("Could not fetch ISS position at the moment.")
 
     st.markdown("---")
-
     st.caption("Dashboard auto-refreshes every 5 minutes. Data courtesy: NOAA SWPC & Open Notify")
 
+    # === COSMIC RAY MAP ===
     st.subheader("Live Cosmic Ray Shower Map")
-    m = folium.Map(location=[0, 0], zoom_start=2)
 
-    data_data = pd.read_csv("TimeStamp.csv")
-    data_data.replace("null", pd.NA, inplace=True)
-    data_data["TimeStamp"] = pd.to_datetime(data_data["TimeStamp"])
-    for col in data_data.columns:
-        if col != "TimeStamp":
-            data_data[col] = pd.to_numeric(data_data[col], errors="coerce")
-    latest = data_data.iloc[-1]
-    latest_time = latest["TimeStamp"]
-    station_counts = latest.drop("TimeStamp").to_dict()
+    try:
+        data_data = pd.read_csv("TimeStamp.csv")
+        data_data.replace("null", pd.NA, inplace=True)
+        data_data["TimeStamp"] = pd.to_datetime(data_data["TimeStamp"])
+        for col in data_data.columns:
+            if col != "TimeStamp":
+                data_data[col] = pd.to_numeric(data_data[col], errors="coerce")
 
-    station_coords = {
-        "  ICRB": (28.3, -16.51), "     ICRO": (27.3, -15.51), "    ATHN": (37.98, 23.73),
-        "    CALM": (39.2, -3.2), "    BKSN": (43.28, 42.69), "    JUNG": (46.55, 7.98),
-        "   JUNG1": (45.55, 6.98), "    LMKS": (49.2, 20.22), "    IRK2": (52.3, 104.3),
-        "    DRBS": (50.1, 4.6), "    NEWK": (39.68, -75.75), "   KIEL2": (54.32, 10.13),
-        "    YKTK": (62.02, 129.7), "    KERG": (-49.35, 70.25), "    CALG": (51.05, -114.07),
-        "    OULU": (65.05, 25.47), "    APTY": (67.57, 33.38), "    TXBY": (71.58, 128.92),
-        "    FSMT": (60.02, -111.93), "    INVK": (68.36, -133.72), "    NAIN": (56.55, -61.68),
-        "    PWNK": (54.98, -85.43), "    THUL": (76.51, -68.71), "    MWSB": (-67.6, 62.88),
-        "    MWSN": (-66.6, 61.88), "    SOPB": (-90.0, 0.0), "    SOPO": (-85.0, 2.0),
-        "    TERA": (-66.67, 140.01),
-    }
+        latest = data_data.iloc[-1]
+        latest_time = latest["TimeStamp"]
+        station_counts = latest.drop("TimeStamp").to_dict()
 
-    st.markdown("#### Filter Shower Events")
-    intensity_options = st.multiselect(
-        "Select intensity levels to display",
-        options=["Low", "Moderate", "High"],
-        default=[]
-    )
+        station_coords = {
+            "  ICRB": (28.3, -16.51), "     ICRO": (27.3, -15.51), "    ATHN": (37.98, 23.73),
+            "    CALM": (39.2, -3.2), "    BKSN": (43.28, 42.69), "    JUNG": (46.55, 7.98),
+            "   JUNG1": (45.55, 6.98), "    LMKS": (49.2, 20.22), "    IRK2": (52.3, 104.3),
+            "    DRBS": (50.1, 4.6), "    NEWK": (39.68, -75.75), "   KIEL2": (54.32, 10.13),
+            "    YKTK": (62.02, 129.7), "    KERG": (-49.35, 70.25), "    CALG": (51.05, -114.07),
+            "    OULU": (65.05, 25.47), "    APTY": (67.57, 33.38), "    TXBY": (71.58, 128.92),
+            "    FSMT": (60.02, -111.93), "    INVK": (68.36, -133.72), "    NAIN": (56.55, -61.68),
+            "    PWNK": (54.98, -85.43), "    THUL": (76.51, -68.71), "    MWSB": (-67.6, 62.88),
+            "    MWSN": (-66.6, 61.88), "    SOPB": (-90.0, 0.0), "    SOPO": (-85.0, 2.0),
+            "    TERA": (-66.67, 140.01),
+        }
 
-    def get_intensity_level(count):
-        if pd.isna(count):
-            return "No Data"
-        elif count > 200:
-            return "High"
-        elif count > 100:
-            return "Moderate"
-        else:
-            return "Low"
+        st.markdown("#### Filter Shower Events")
+        intensity_options = st.multiselect(
+            "Select intensity levels to display",
+            options=["Low", "Moderate", "High"],
+            default=["High", "Moderate"]
+        )
 
-    def get_color(count):
-        if count > 200:
-            return 'red'
-        elif count > 100:
-            return 'orange'
-        else:
-            return 'green'
+        def get_intensity_level(count):
+            if pd.isna(count):
+                return "No Data"
+            elif count > 200:
+                return "High"
+            elif count > 100:
+                return "Moderate"
+            else:
+                return "Low"
 
-    for station, count in station_counts.items():
-        if station in station_coords and pd.notna(count):
-            lat, lon = station_coords[station]
-            intensity = get_intensity_level(count)
-            if intensity not in intensity_options:
-                continue
+        def get_color(count):
+            if count > 200:
+                return 'red'
+            elif count > 100:
+                return 'orange'
+            else:
+                return 'green'
 
-            folium.CircleMarker(
-                location=[lat, lon],
-                radius=7,
-                color=get_color(count),
-                popup=f"Station: {station}\nRelative Neutron Count: {count}\nTime: {latest_time}",
-                fill=True,
-                fill_opacity=0.7
-            ).add_to(m)
+        m = folium.Map(location=[0, 0], zoom_start=2)
 
-    folium_static(m)
-    st.write("We acknowledge the NMDB database www.nmdb.eu, funded under the EU's FP7 programme (contract no. 213007), for providing data.")
+        for station, count in station_counts.items():
+            if station in station_coords and pd.notna(count):
+                lat, lon = station_coords[station]
+                intensity = get_intensity_level(count)
+                if intensity in intensity_options:
+                    folium.CircleMarker(
+                        location=[lat, lon],
+                        radius=7,
+                        color=get_color(count),
+                        popup=f"{station.strip()}:\nCount: {count}\nTime: {latest_time}",
+                        fill=True,
+                        fill_opacity=0.7
+                    ).add_to(m)
 
+        folium_static(m)
+        st.write("We acknowledge the NMDB database (www.nmdb.eu), funded under the EU's FP7 programme (contract no. 213007), for providing data.")
+
+    except FileNotFoundError:
+        st.error("⚠️ 'TimeStamp.csv' not found. Please upload the data file.")
+    except Exception as e:
+        st.error(f"An error occurred while processing cosmic ray data: {e}")
 
 # Tab 3: Biological Effects
 with tabs[2]:
