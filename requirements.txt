@@ -5,9 +5,8 @@ datetime
 matplotlib
 pandas
 folium
-streamlit_folium
+streamlit-folium
 plotly
-datetime
 fpdf
 seaborn
-stream_autorefresh
+streamlit-autorefresh
